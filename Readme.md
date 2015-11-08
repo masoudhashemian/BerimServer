@@ -1,4 +1,4 @@
-# AnonTXT demo app
+# Berim Social Network
 
 ## Getting started
 
