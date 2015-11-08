@@ -1,0 +1,79 @@
+body {
+background-image:url('../img/background2.jpg');
+}
+
+form{
+width:350px;
+top:30px;
+left:460px;
+position:relative;
+}
+
+form p{
+    top:-15px;
+left:100px;
+position:relative;   
+}
+
+form label{
+padding:5px;
+}
+
+form input,select{
+float:right;
+}
+
+.container  ul{
+list-style-type: none;
+}
+
+#submit {
+border:none;
+background-color: orange;
+padding: 10px;
+border-radius: 5px;
+width:100px;
+color:white;
+font-size:16px;
+float:right;
+position:relative;
+right:126px;
+}
+
+input,select{
+padding: 5px;
+border-radius: 5px;
+border-color:orange;
+border-width:1px;
+}
+
+fieldset {
+padding: 5px;
+border-radius: 5px;
+border-color:orange;
+border-width:1px;
+background-color:white;
+}
+
+legend {
+padding:10px;
+}
+
+#footer {
+clear:both;
+text-align:center;
+position:relative;
+top:60px;
+}
+
+fieldset #title {
+font-size:250%;
+font-weight:bold;
+position:relative;
+right:120px;
+height:10px;
+}
+
+a {
+    text-decoration: none;
+}
