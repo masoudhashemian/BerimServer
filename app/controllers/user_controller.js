@@ -1,6 +1,6 @@
 var _       = require('lodash');
 var helpers = require('./_helpers');
-var orm     = require('../../../../');
+var orm     = require('orm');
 
 module.exports = {
   register: function (req, res, next) {

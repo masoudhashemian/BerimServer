@@ -1,4 +1,4 @@
-var orm      = require('../../../../');
+var orm      = require('orm');
 var settings = require('../../config/settings');
 
 var connection = null;
