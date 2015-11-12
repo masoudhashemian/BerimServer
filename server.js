@@ -5,9 +5,13 @@ var settings    = require('./config/settings');
 var environment = require('./config/environment');
 var routes      = require('./config/routes');
 var models      = require('./app/models/');
+var http = require('http');
+var socketServer = require('socket.io');
 
 module.exports.start = function (done) {
   var app = express();
+  
+  var io = new socketServer(http.createServer(app));
 
   environment(app);
   routes(app);
