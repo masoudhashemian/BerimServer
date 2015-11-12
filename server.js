@@ -4,15 +4,22 @@ var colors      = require('colors')
 var settings    = require('./config/settings');
 var environment = require('./config/environment');
 var routes      = require('./config/routes');
+var sockets =  require('./config/sockets');
 var models      = require('./app/models/');
+var http = require('http');
+var socketServer = require('socket.io');
 
 module.exports.start = function (done) {
-  var app = express();
-
+  var app = express(); 
+  
+  var httpServer = http.createServer(app);  
+  var io = socketServer.listen(httpServer);    
+  
   environment(app);
   routes(app);
+  sockets(io);
 
-  app.listen(settings.port, function () {
+  httpServer.listen(settings.port, function () {
     console.log( ("Listening on port " + settings.port).green );
 
     if (done) {
