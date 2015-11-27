@@ -14,7 +14,7 @@ module.exports = function (app) {
         if (err) return next(err);
 
         req.models = db.models;
-        req.db     = db;
+        req.db     = db;		
 
         return next();
       });
