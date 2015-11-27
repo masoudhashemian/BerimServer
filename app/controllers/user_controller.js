@@ -25,12 +25,13 @@ module.exports ={
 					},
 					signIn: function (req, res, next){
 						var params = _.pick(req.body, 'phoneNumber','password');	         
-						req.models.user.find(params, function (err, user) {
-							if(user.length==0)			
+						req.models.user.find(params, function (err, users) {
+							if(users.length==0)			
 								//return res.send(401, { errors: helpers.formatErrors() });
 								return res.send(401, "Error!");
 							else
-								return res.send(200, user.phoneNumber);
+								user = users[0]
+								return res.send(200, user.serialize());
       
 						});
 					}
