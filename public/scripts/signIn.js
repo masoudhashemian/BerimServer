@@ -6,7 +6,7 @@
 		return false;
 	});
 	
-	socket.on('signInDone', function(data){	    
+	socket.on('signInResponse', function(data){	    
 		$('.signInForm').hide();			
 		$('.chat').show();
 		socket.emit('getOnlineUsers');
@@ -15,7 +15,7 @@
 		//alert('Dear user, you have signed in sucessfully, password : '+password+', phone number : '+phoneNumber);
 	});
 	
-	socket.on('signInFailed', function(data){
+	socket.on('signInResponse', function(data){
 		$('.signInForm').hide();		
 		var err = data.err;
 		var status = data.status;

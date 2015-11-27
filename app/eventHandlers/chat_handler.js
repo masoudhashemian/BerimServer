@@ -4,7 +4,8 @@ var orm     = require('orm');
 var settings = require('../../config/settings');
 
 module.exports = function(io ,socket, clients){	
-	socket.on('broadcast', function(msg){	    
+	socket.on('broadcast', function(msg){	
+		console.log(msg);    
 		socket.broadcast.emit('broadcast', msg);
 	});
 	
@@ -19,13 +20,15 @@ module.exports = function(io ,socket, clients){
 			{ form: data },
 			function (error, response, body) {
 				if (!error && response.statusCode == 200) {
+					console.log("logged in" + body);
 				    body = JSON.parse(body);					
 					socket.userId = body.id;
-					socket.emit('signInDone', body);
+					socket.emit('signInResponse', body);
 				}else{
+					console.log("logged in" + body);
 					data.err = body;
 					data.status = response.statusCode;	
-					socket.emit('signInFailed', data);
+					socket.emit('signInResponse', data);
 				}
 			}
 		);	
