@@ -23,24 +23,15 @@ module.exports ={
 							  return res.send(200, user.serialize());  	  
 						});
 					},
-					signIn : function(req, res, next){
-						var params = _.pick(req.body, 'password', 'phoneNumber');								
-						req.models.user.find(params, function (err, users) 
-						{
-							  if(err) 
-							  {
-									if(Array.isArray(err))
-									{
-									  console.log({errors: helpers.formatErrors(err) });
-									  return res.send(600, {errors: helpers.formatErrors(err) });
-									}
-									else 
-									{
-									  return next(err);
-									}
-							  }
-							  user = users[0];							  
-							  return res.send(200, user.serialize());	  
-						});						
+					signIn: function (req, res, next){
+						var params = _.pick(req.body, 'phoneNumber','password');	         
+						req.models.user.find(params, function (err, user) {
+							if(user.length==0)			
+								//return res.send(401, { errors: helpers.formatErrors() });
+								return res.send(401, "Error!");
+							else
+								return res.send(200, user.phoneNumber);
+      
+						});
 					}
 				};
