@@ -17,7 +17,7 @@ module.exports.start = function (done) {
   
   environment(app);
   routes(app);
-  sockets(io);
+  sockets(io, app);
 
   httpServer.listen(settings.port, function () {
     console.log( ("Listening on port " + settings.port).green );
