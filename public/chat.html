@@ -13,36 +13,14 @@
       .chat #messages { list-style-type: none; margin: 0; padding: 0; }
       .chat #messages li { padding: 5px 10px; }
       .chat #messages li:nth-child(odd) { background: #eee; }
+	  .user {cursor: pointer;}
+	  .user:hover {background: yellow;}
+	  .selected {background: green;}
     </style>
   </head>
 <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
 <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
 <script type="text/javascript" src="scripts/signIn.js"></script>
-<script>  
-  var socket = io('');
-
-$(document).ready(function(){	
-  $('form').submit(function(){
-    var message = new Object();
-	message.text = $('#m').val();	
-    socket.emit('broadcast', JSON.stringify(message));
-    $('#m').val('');	
-    return false;
-  });	
-  socket.on('broadcast', function(msg){
-    var message = JSON.parse(msg);
-    $('#messages').append($('<li>').text(message.text));
-  });  
-  socket.on('new user', function(msg){
-	$('#messages').append($('<li>').text(msg));
-  });  
-  socket.on('get history', function(docs){
-	for (i = 0; i < docs.length; i++) { 
-    $('#messages').append($('<li>').text(docs[i].text));
-	}
-  });
-});  
-</script> 
   <body>  
   <div class="signIn">
         <div class="container"> 
@@ -73,9 +51,11 @@ $(document).ready(function(){
   </div>
   <div class="chat">
     <ul id="messages"></ul>		
-	<ul id="users">
+	<p></p>
+	<ul id="users">	
 	</ul>
     <form action="" id="msg">
+	  <input id="to" type="hidden" value="">
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
   </body>

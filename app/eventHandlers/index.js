@@ -1,4 +1,4 @@
 
 module.exports = {
-  chat     : require('./chat_handler'),
+  sckt     : require('./socket_handler'),
 };
