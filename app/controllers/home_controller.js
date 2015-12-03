@@ -6,5 +6,8 @@ module.exports = {
   },
   chat : function(req, res, next){
 	res.sendfile(settings.path + '/public/chat.html');
+  },
+  eventTester : function(req, res, next){
+	res.sendfile(settings.path + '/public/eventTester.html');
   }
 };

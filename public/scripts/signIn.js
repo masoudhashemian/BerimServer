@@ -1,4 +1,4 @@
- var socket = io('');
+ var socket = io();
  
  $(document).ready(function () {	
  
@@ -10,12 +10,15 @@
     $('#m').val('');	
     return false;
   });	
+  
   socket.on('sendMessageResponse', function(msg){    
     $('#messages').append($('<li>').text(msg.from+' : '+msg.text));
   });  
+  
   socket.on('new user', function(msg){
 	$('#messages').append($('<li>').text(msg));
   });  
+  
   socket.on('get history', function(docs){
 	for (i = 0; i < docs.length; i++) { 
     $('#messages').append($('<li>').text(docs[i].text));
@@ -26,7 +29,7 @@
 		var data = $('#signIn').serializeObject();
 		socket.emit('signInRequest', data);
 		return false;
-	});
+	}); 
 	
 	socket.on('signInResponse', function(res){	    
 		if(res.error){
@@ -39,23 +42,22 @@
 		var password = data.password;
 		var phoneNumber = data.phoneNumber;
 		}
-	});
+	}); 
 	
 	socket.on('getOnlineUsersResponse', function(res){		
 		if(res.error){
 			alert(res.errorMessage);
 		}else{					
-		users = res.data;	
-		for(var i = 0 ; i < users.length; i++){										
-			$('#users').append($('<li class="user">').text(users[i]));
-			$('.user').click(function(){				
-				$('#to').val($(this).text());
-				$('.chat p').text($(this).text());
-			})
-		}			
-		
-	});
-	
+			users = res.data;	
+			for(var i = 0 ; i < users.length; i++){										
+				$('#users').append($('<li class="user">').text(users[i]));
+				$('.user').click(function(){				
+					$('#to').val($(this).text());
+					$('.chat p').text($(this).text());
+					});
+			}
+		}
+	}); 
 });
 
 $.fn.serializeObject = function()

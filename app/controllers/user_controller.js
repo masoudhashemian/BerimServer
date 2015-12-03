@@ -61,22 +61,37 @@ module.exports ={
 									join = join.serialize();
 									console.log('join created!');
 									console.log(join);
+									
+									return res.send(200, user);
 								});
-							  });
-							  
-							  return res.send(200, user); 	  
+							  });							  							  
 						});
 					},
 					signIn: function (req, res, next){
-						var params = _.pick(req.body, 'phoneNumber','password');	         
+						var params = _.pick(req.body, 'phoneNumber','password');
 						req.models.user.find(params, function (err, users) {
 							if(users.length==0)			
-								//return res.send(401, { errors: helpers.formatErrors() });
-								return res.send(401, "Error!");
-							else
-								user = users[0]
-								return res.send(200, user.serialize());
-      
+							{								
+								return res.send(600, 'Password or Phone number is incorrect!');															
+							}else{
+								user = users[0];
+								user = user.serialize();
+								console.log('user found!');
+								console.log(user);								
+								return res.send(200, user);
+							}
+						});
+					},
+					getRooms: function(req, res, next){
+						var params = _.pick(req.body, 'userId');
+						req.models.join.find(params, function(err, joins){														
+							var rooms = new Array();
+							for(var i = 0; i < joins.length; i++){
+								join = joins[i];
+								join = join.serialize();
+								rooms.push(join.roomId);
+							}						
+							return res.send(200, rooms);
 						});
 					}
 				};

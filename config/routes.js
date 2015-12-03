@@ -7,4 +7,6 @@ module.exports = function (app) {
   app.get( '/chat'                        ,controllers.home.chat);
   app.post( '/user/sign_in'                       ,controllers.user.signIn);  
   app.post('/room/register'                 ,controllers.room.register);
+  app.post('/user/get_rooms'                ,controllers.user.getRooms);
+  app.get('/eventTester'                   ,controllers.home.eventTester);
 };

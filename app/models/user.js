@@ -48,7 +48,7 @@ module.exports = function (orm, db)
 				phoneNumber  : this.phoneNumber,
 				nickName     : this.nickName
 				};
-			}					
+			}
 		}
 	}
 	);

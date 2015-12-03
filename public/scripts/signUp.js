@@ -1,21 +1,30 @@
-$(document).ready(function () {
-	$signUpForm = $('#signUp');
+var socket = io();
+
+$(document).ready(function () {	
+	$('#signUp').submit(function (e) {						
+		var data = $('#signUp').serializeObject();				
+		socket.emit('signUpRequest', data);
+		return false;				
+	});
 	
-	$signUpForm.submit(function (e) {
-		e.preventDefault();
-		
-$.ajax({
-      url    : $signUpForm.attr('action'),
-      method : 'post',
-      data   : $signUpForm.serialize()
-    }).done(function (data) {
-		$('.registerationForm').hide();
-		var userName = data.userName;
-		var password = data.password;
-		var phoneNumber = data.phoneNumber;
-		alert('Dear '+userName+', you have registered sucessfully, password : '+password+', phone number : '+phoneNumber);
-    }).fail(function (xhr, err, status) {
-		alert('failed :(');
-    });		
+	socket.on('signUpResponse', function(res){		
+		console.log(res);
 	});
 });
+
+$.fn.serializeObject = function()
+{
+    var o = {};
+    var a = this.serializeArray();
+    $.each(a, function() {
+        if (o[this.name] !== undefined) {
+            if (!o[this.name].push) {
+                o[this.name] = [o[this.name]];
+            }
+            o[this.name].push(this.value || '');
+        } else {
+            o[this.name] = this.value || '';
+        }
+    });
+    return o;
+};
