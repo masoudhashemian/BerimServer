@@ -4,15 +4,16 @@
     <meta charset="utf-8">
     <title>Berim</title>
     <link rel="stylesheet" type="text/css" href="./style/signUp.css">
+	<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script type="text/javascript" src="signUp.js"></script>
+    <script type="text/javascript" src="./scripts/signUp.js"></script>
   </head>
   <body>
         <div class="container"> 
             <div class="">
                 <ul class="">
 					<div class="registerationForm">
-                    <form id="signUp" method="post" action="/register" enctype="multipart/form-data">
+                    <form id="signUp" method="post" action="/user/sign_up" enctype="multipart/form-data">
 
                         <fieldset>
                             <p id="title">SignUp</p>
@@ -20,7 +21,7 @@
                                 </label></li>
 
 
-                            <li><label class="">Username</label><input required name='userName' type="text" placeholder="Username" value=""/></li>
+                            <li><label class="">Nick name</label><input required name='nickName' type="text" placeholder="Username" value=""/></li>
                             <br/>
                             <li><label class="">Password</label><input required name='password' type="password" placeholder="Password"/></li>
                             <br/>

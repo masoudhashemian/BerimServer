@@ -1,7 +1,7 @@
 
-var eventHandlers = require('../app/eventHandlers')
+var eventHandlers = require('../app/eventHandlers/')
 
-module.exports = function (io, socket) {    
-  //eventHandlers.chat(io.of('/chat'), socket); ??????????  
-  eventHandlers.chat(io, socket);
+module.exports = function (io, socket, clients) {    
+  //eventHandlers.chat(io.of('/chat'), socket);
+  eventHandlers.sckt(io, socket, clients);
 };
