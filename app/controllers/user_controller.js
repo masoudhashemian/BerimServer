@@ -23,9 +23,9 @@ module.exports ={
 							  console.log('user created!');
 							  console.log(user);
 							  // create a room for user
-							  room = new Object();
-							  room.name = user.nickName;
-							  req.models.room.create(room, function(err, room){								
+							  newRoom = new Object();
+							  newRoom.name = user.nickName;
+							  req.models.room.create(newRoom, function(err, room){								
 								if(err)
 								{
 									if(Array.isArray(err))
@@ -40,8 +40,28 @@ module.exports ={
 								}
 								room = room.serialize();
 								console.log('room created!');
+								console.log(room);
 								//insert new user to his own room
-								
+								newJoin = new Object();
+								newJoin.userId = user.id;
+								newJoin.roomId = room.id;
+								req.models.join.create(newJoin, function(err, join){
+									if(err)
+									{
+										if(Array.isArray(err))
+										{
+											console.log({errors: helpers.formatErrors(err) });
+											return res.send(600, {errors: helpers.formatErrors(err) });
+										}
+										else 
+										{
+											return next(err);
+										}									
+									}
+									join = join.serialize();
+									console.log('join created!');
+									console.log(join);
+								});
 							  });
 							  
 							  return res.send(200, user); 	  
