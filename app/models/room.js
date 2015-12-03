@@ -12,8 +12,8 @@ module.exports = function (orm, db)
 	{   
 		 hooks: {
 					beforeCreate: function (next) {
-						console.log('befor create!');
 						this.createDate = Date.now();
+						return next();
 					}
 		}  ,	
 		

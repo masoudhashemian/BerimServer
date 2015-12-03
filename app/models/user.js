@@ -4,7 +4,8 @@ module.exports = function (orm, db)
 {
 	var User = db.define('user', {
 		password      : { type: 'text', required: true},
-		phoneNumber : { type: 'number', required: true, unique:true}
+		phoneNumber : { type: 'number', required: true, unique:true},
+		nickName : {type : 'text'}
 	},
 		
 	{   
@@ -27,14 +28,14 @@ module.exports = function (orm, db)
 	
 		validations: 
 		{
-			password: [
+		/*	password: [
 				orm.enforce.security.password('lun', 'Invalid password,Password must contain number, lower and uppercase letter'),
 				orm.enforce.ranges.length(8, undefined, "username must be at least 8 letters long"),
 				orm.enforce.ranges.length(undefined, 30, "password cannot be longer than 30 letters")
 			],
 			phoneNumber:[
 				orm.enforce.ranges.length(11, 11, "Must contain 11 characters")
-			]
+			] */
 		},
 		
 		methods: 
@@ -44,12 +45,9 @@ module.exports = function (orm, db)
 				return {
 				id           : this._id,
 				password     : this.password,
-				phoneNumber  : this.phoneNumber				
+				phoneNumber  : this.phoneNumber,
+				nickName     : this.nickName
 				};
-			},
-			getPhoneNumber: function () 
-			{
-				return this.phoneNumber        
 			}					
 		}
 	}

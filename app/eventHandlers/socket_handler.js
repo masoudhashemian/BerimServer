@@ -7,13 +7,13 @@ module.exports = function(io ,socket, clients){
 	//requests
 	socket.on('signUpRequest', function(data){	
 		request.post(
-			'http://localhost:'+settings.port+'/sign_up',
+			'http://localhost:'+settings.port+'/user/sign_up',
 			{ form: data },
 			function (error, response, body) {
 				if (!error && response.statusCode == 200) {					
 				    body = JSON.parse(body);					
 					socket.userId = body.id;
-					socket.join(socket.userId);
+					socket.join(socket.userId);					
 					error = false;
 					res = new Object();
 					res.error = error;
@@ -32,7 +32,7 @@ module.exports = function(io ,socket, clients){
 	
 	socket.on('signInRequest', function(data){	
 		request.post(
-			'http://localhost:'+settings.port+'/sign_in',
+			'http://localhost:'+settings.port+'/user/sign_in',
 			{ form: data },
 			function (error, response, body) {
 				if (!error && response.statusCode == 200) {					

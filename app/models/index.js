@@ -5,6 +5,7 @@ var connection = null;
 
 function setup(db, cb) {
   require('./user')(orm, db);  
+  require('./room')(orm, db);  
 
   return cb(null, db);
 }
