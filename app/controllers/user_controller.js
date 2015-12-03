@@ -18,8 +18,7 @@ module.exports ={
 									{
 									  return next(err);
 									}
-							  }
-							  user = user.serialize();
+							  }							  
 							  console.log('user created!');
 							  console.log(user);
 							  // create a room for user
@@ -37,14 +36,15 @@ module.exports ={
 									{
 									  return next(err);
 									}									
-								}
-								room = room.serialize();
+								}								
 								console.log('room created!');
-								console.log(room);
-								//insert new user to his own room
+								console.log(room.serialize());	
+								user.room = room;
+								user.save();
+								//insert new user to his own room								
 								newJoin = new Object();
-								newJoin.userId = user.id;
-								newJoin.roomId = room.id;
+								newJoin.userId = user._id;
+								newJoin.roomId = room._id;
 								req.models.join.create(newJoin, function(err, join){
 									if(err)
 									{
@@ -57,12 +57,11 @@ module.exports ={
 										{
 											return next(err);
 										}									
-									}
-									join = join.serialize();
+									}									
 									console.log('join created!');
-									console.log(join);
+									console.log(join.serialize());
 									
-									return res.send(200, user);
+									return res.send(200, user.serialize());
 								});
 							  });							  							  
 						});
@@ -74,11 +73,10 @@ module.exports ={
 							{								
 								return res.send(600, 'Password or Phone number is incorrect!');															
 							}else{
-								user = users[0];
-								user = user.serialize();
+								user = users[0];								
 								console.log('user found!');
-								console.log(user);								
-								return res.send(200, user);
+								console.log(user.serialize());								
+								return res.send(200, user.serialize());
 							}
 						});
 					},
@@ -87,8 +85,7 @@ module.exports ={
 						req.models.join.find(params, function(err, joins){														
 							var rooms = new Array();
 							for(var i = 0; i < joins.length; i++){
-								join = joins[i];
-								join = join.serialize();
+								join = joins[i];								
 								rooms.push(join.roomId);
 							}						
 							return res.send(200, rooms);

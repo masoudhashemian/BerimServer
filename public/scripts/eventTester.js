@@ -1,42 +1,55 @@
 socket = io();
 
-$(document).ready(function(){
-	$('#eventTesterForm').submit(function(){
+$(document).ready(function(){	
+	$('#eventTesterForm').submit(function(e){
+		e.preventDefault();
 		fireEvent = $('#fireEvent').val();
 		if(!fireEvent){
 			fireEvent = 'dummy';
 		}
-		listenEvent = $('#listenEvent').val();
-		if(!listenEvent){
-			listenEvent = 'dummuy';
-		}
-		message = $('#message').val();
-		if(message){
-			message = JSON.parse(message);		
+		listenEvents = $('#listenEvent').val();
+		if(!listenEvents){
+			listenEvents = 'dummy';
 		}else{
-			message = new Object();
+			listenEvents = listenEvents.split("-");
+		}		
+		fireMessage = $('#fireMessage').val();
+		if(fireMessage){
+			fireMessage = JSON.parse(fireMessage);		
+		}else{
+			fireMessage = new Object();
 		}
-		console.log('listening on : '+fireEvent+'Response');
-		socket.on(fireEvent+'Response',function(res){			
-			if(fireEvent=='signIn' || fireEvent=='signUp'){				
-				if(!res.error){
-					$('#userId').val(res.data.id);
-				}
+		trigger = $('#trigger').val();		
+		
+		if(fireEvent != 'dummy'){
+			console.log('listening on : '+fireEvent+'Response');
+			socket.on(fireEvent+'Response',function(res){			
+				console.log(fireEvent+'Response');
+				console.log(res);
+			});
+		}
+		if(listenEvents != 'dummy'){
+			for(var i = 0 ; i < listenEvents.length ; i++){
+				listenEvent = listenEvents[i];
+				if(i==0){
+					console.log('listening on : '+listenEvent+', with Trigger');
+					socket.on(listenEvent, function(res){
+						console.log(listenEvent);
+						console.log(res);							
+						eval(trigger);
+					});
+				}else{
+					console.log('listening on : '+listenEvent);
+					socket.on(listenEvent, function(res){
+						console.log(listenEvent);
+						console.log(res);
+					});
+				}			
 			}
-			console.log(fireEvent+'Response');
-			console.log(res);
-		});		
-		console.log('listening on : '+listenEvent+'Request');
-		socket.on(listenEvent+'Request', function(res){
-			console.log(listenEvent+'Response');
-			console.log(res);
-		});
-		userId = $('#userId').val();
-		if(userId){
-			message.userId = userId;
 		}
-		console.log('firing : '+fireEvent+'Request');
-		socket.emit(fireEvent+'Request', message);
-		return false;
+		if(fireEvent != 'dummy'){
+			console.log('firing : '+fireEvent+'Request');
+			socket.emit(fireEvent+'Request', fireMessage);		
+		}	
 	});
 });

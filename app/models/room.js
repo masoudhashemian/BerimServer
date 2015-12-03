@@ -6,7 +6,7 @@ module.exports = function (orm, db)
 		name      : { type: 'text', required: true},
 		placeId : { type: 'number'},
 		maxUserCount : {type : 'number', defaultValue : 1},
-		createDate : {type : 'date', time : false}		
+		createDate : {type : 'date', time : true}		
 	},
 		
 	{   

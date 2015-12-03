@@ -5,7 +5,8 @@ module.exports = function (orm, db)
 	var User = db.define('user', {
 		password      : { type: 'text', required: true},
 		phoneNumber : { type: 'number', required: true, unique:true},
-		nickName : {type : 'text'}
+		nickName : {type : 'text'},
+		room     : {type : 'object'}
 	},
 		
 	{   
@@ -43,13 +44,14 @@ module.exports = function (orm, db)
 			serialize: function () 
 			{
 				return {
-				id           : this._id,
-				password     : this.password,
-				phoneNumber  : this.phoneNumber,
-				nickName     : this.nickName
+					id           : this._id,
+					password     : this.password,
+					phoneNumber  : this.phoneNumber,
+					nickName     : this.nickName,					
+					roomId       : this.room._id
 				};
-			}
+			}			
 		}
 	}
-	);
+	);	
 };

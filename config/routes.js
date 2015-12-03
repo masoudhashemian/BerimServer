@@ -8,5 +8,7 @@ module.exports = function (app) {
   app.post( '/user/sign_in'                       ,controllers.user.signIn);  
   app.post('/room/register'                 ,controllers.room.register);
   app.post('/user/get_rooms'                ,controllers.user.getRooms);
-  app.get('/eventTester'                   ,controllers.home.eventTester);
+  app.get('/eventTester'                    ,controllers.home.eventTester);
+  app.post('/chat/add_message'              ,controllers.message.add);
+  app.post('/chat/change_message_status'    ,controllers.message.changeStatus)
 };

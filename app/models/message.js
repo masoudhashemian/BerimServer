@@ -2,9 +2,11 @@ var moment = require('moment');
 
 module.exports = function (orm, db) 
 {
-	var Join = db.define('join', {		
-		userId      : { type: 'number', required: true},
+	var Message = db.define('message', {		
+		senderId      : { type: 'number', required: true},
 		roomId : { type: 'number', required: true},
+		text : {type: 'text', required: true},
+		status : {type: 'text', defaultValue: 'deliverAtServer'},				
 		date : {type : 'date', time : true}		
 	},
 		
@@ -22,9 +24,11 @@ module.exports = function (orm, db)
 			{
 				return {
 				id           : this._id,
-				userId     : this.userId,
-				roomId  : this.roomId,				
-				date : this.date
+				senderId     : this.senderId,
+				roomId       : this.roomId,
+				text         : this.text,
+				status       : this.status,
+				date         : this.date
 				};
 			}
 		}

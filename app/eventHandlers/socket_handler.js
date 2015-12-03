@@ -13,8 +13,14 @@ module.exports = function(io ,socket, clients){
 			function (error, response, body) {
 				if (!error && response.statusCode == 200) {					
 				    user = JSON.parse(body);										
-					socket.userId = user.id;									
-					request.post(
+					socket.userId = user.id;
+					socket.join(user.roomId);
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = user;
+					socket.emit('signUpResponse', res);					
+					/*request.post(
 						'http://localhost:'+settings.port+'/user/get_rooms',
 						{ form: {userId: user.id}},
 						function (error, response, body){							
@@ -37,7 +43,7 @@ module.exports = function(io ,socket, clients){
 								socket.emit('signUpResponse', res);
 							}
 						}
-					);
+					);*/
 				}else{				
 					error = true;
 					res = new Object();
@@ -80,7 +86,7 @@ module.exports = function(io ,socket, clients){
 								socket.emit('signInResponse', res);
 							}
 						}
-					);					
+					);			
 				}else{					
 					error = true;
 					res = new Object();
@@ -95,8 +101,58 @@ module.exports = function(io ,socket, clients){
 	
 	//events
 	socket.on('sendMessageRequest', function(msg){
-		
-		io.sockets.in(msg.roomId).emit('getMessageRequest', msg);		
+		msg.senderId = socket.userId;
+		request.post(
+			'http://localhost:'+settings.port+'/chat/add_message',
+			{ form: msg},
+			function (error, response, body){							
+				if(!error && response.statusCode == 200){	
+					msg = JSON.parse(body);
+
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = {message: 'Message was recieved at server!'};								
+					socket.emit('sendMessageResponse', res);
+					io.sockets.in(msg.roomId).emit('newMessage', msg);
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = body;									
+					socket.emit('sendMessageResponse', res);
+				}
+			}
+		);				
+	});
+	
+	socket.on('changeMessageStatusRequest', function(msg){		
+		request.post(
+			'http://localhost:'+settings.port+'/chat/change_message_status',
+			{ form: msg},
+			function (error, response, body){							
+				if(!error && response.statusCode == 200){	
+					body = JSON.parse(body);
+					msg = body.message;
+					sender = body.sender;
+
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = {message: 'Status of message was changed!'};								
+					socket.emit('changeMessageStatusResponse', res);			
+					console.log(sender.roomId);
+					console.log(io.sockets.adapter.rooms);
+					io.sockets.in(sender.roomId).emit('changeMessageStatus', msg);
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = body;									
+					socket.emit('changeMessageStatusResponse', res);
+				}
+			}
+		);			
 	});
 	
 	socket.on('disconnect', function() {
