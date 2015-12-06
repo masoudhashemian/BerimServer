@@ -19,31 +19,7 @@ module.exports = function(io ,socket, clients){
 					res = new Object();
 					res.error = error;
 					res.data = user;
-					socket.emit('signUpResponse', res);					
-					/*request.post(
-						'http://localhost:'+settings.port+'/user/get_rooms',
-						{ form: {userId: user.id}},
-						function (error, response, body){							
-							if(!error && response.statusCode == 200){	
-								rooms = JSON.parse("[" + body + "]");
-								for(var i = 0 ; i < rooms.length; i++){
-									room = rooms[i];
-									socket.join(room);
-								}
-								error = false;
-								res = new Object();
-								res.error = error;
-								res.data = user;								
-								socket.emit('signUpResponse', res);								
-							}else{				
-								error = true;
-								res = new Object();
-								res.error = error;
-								res.errorMessage = body;									
-								socket.emit('signUpResponse', res);
-							}
-						}
-					);*/
+					socket.emit('signUpResponse', res);
 				}else{				
 					error = true;
 					res = new Object();
@@ -98,6 +74,28 @@ module.exports = function(io ,socket, clients){
 		);	
 	});
 	
+	socket.on('getChatListRequest', function(data){		
+		data.userId = socket.userId;
+		request.post(
+			'http://localhost:'+settings.port+'/chat/get_chat_list',
+			{ form: data },
+			function (error, response, body) {
+				if (!error && response.statusCode == 200) {
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = body;					
+					socket.emit('getChatListResponse', res);
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = body;									
+					socket.emit('getChatListResponse', res);
+				}
+			}
+		);		
+	});
 	
 	//events
 	socket.on('sendMessageRequest', function(msg){

@@ -11,5 +11,16 @@ module.exports = {
       errors[e.property].push(e.msg);
     }
     return errors;
-  }
+  },
+  reportErrors: function(res, next, err){				
+		if(Array.isArray(err))
+		{
+			console.log({errors: helpers.formatErrors(err) });
+			return res.send(600, {errors: helpers.formatErrors(err) });
+		}
+		else 
+		{
+			return next(err);
+		}
+  }	
 };

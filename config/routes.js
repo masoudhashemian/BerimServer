@@ -10,5 +10,6 @@ module.exports = function (app) {
   app.post('/user/get_rooms'                ,controllers.user.getRooms);
   app.get('/eventTester'                    ,controllers.home.eventTester);
   app.post('/chat/add_message'              ,controllers.message.add);
-  app.post('/chat/change_message_status'    ,controllers.message.changeStatus)
+  app.post('/chat/change_message_status'    ,controllers.message.changeStatus);
+  app.post('/chat/get_chat_list'    ,controllers.message.getChatList);
 };

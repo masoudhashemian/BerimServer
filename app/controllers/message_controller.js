@@ -74,5 +74,29 @@ module.exports ={
 									});																															
 								});						
 						});						
+					},
+					getChatList: function(req, res, next){
+						var params = _.pick(req.body, 'userId', 'messageId');
+						req.models.message.get(params.messageId, function(err, msg){
+							if(err)
+							{
+								helpers.reportErrors(res, next, err);
+							}							
+							req.models.user.get(params.userId, function(err, user){
+								if(err){
+									helpers.reportErrors(res, next, err);
+								}
+								console.log(msg.serialize());
+								console.log(user.serialize());
+								req.models.message.find({date: {$gt: msg.date}, $or : [{senderId : user._id}, {roomId : user.getRoomId()}]}, function(err, msgs){
+									if(err){
+										helpers.reportErrors(err);
+									}									
+									return res.send(200, msgs);
+								});
+							});							
+						});
 					}
 				};
+				
+				

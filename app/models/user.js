@@ -50,7 +50,10 @@ module.exports = function (orm, db)
 					nickName     : this.nickName,					
 					roomId       : this.room._id
 				};
-			}			
+			},
+			getRoomId: function(){
+				return this.room._id;							
+			}
 		}
 	}
 	);	
