@@ -1,5 +1,8 @@
 socket = io();
 
+firingEvents = [];
+listeningEvents = [];
+
 $(document).ready(function(){	
 	$('#eventTesterForm').submit(function(e){
 		e.preventDefault();
@@ -21,30 +24,35 @@ $(document).ready(function(){
 		}
 		trigger = $('#trigger').val();		
 		
-		if(fireEvent != 'dummy'){
+		if(fireEvent != 'dummy' && $.inArray(fireEvent, firingEvents) == -1){
 			console.log('listening on : '+fireEvent+'Response');
 			socket.on(fireEvent+'Response',function(res){			
 				console.log(fireEvent+'Response');
 				console.log(res);
 			});
+			firingEvents.push(fireEvent);
 		}
 		if(listenEvents != 'dummy'){
 			for(var i = 0 ; i < listenEvents.length ; i++){
 				listenEvent = listenEvents[i];
-				if(i==0){
-					console.log('listening on : '+listenEvent+', with Trigger');
-					socket.on(listenEvent, function(res){
-						console.log(listenEvent);
-						console.log(res);							
-						eval(trigger);
-					});
-				}else{
-					console.log('listening on : '+listenEvent);
-					socket.on(listenEvent, function(res){
-						console.log(listenEvent);
-						console.log(res);
-					});
-				}			
+				if($.inArray(listenEvent, listeningEvents) == -1){
+					if(i==0){
+						console.log('listening on : '+listenEvent+', with Trigger');
+						socket.on(listenEvent, function(res){
+							console.log(listenEvent);
+							console.log(res);							
+							eval(trigger);
+						});
+						listeningEvents.push(listenEvent);
+					}else{
+						console.log('listening on : '+listenEvent);
+						socket.on(listenEvent, function(res){
+							console.log(listenEvent);
+							console.log(res);
+						});
+						listeningEvents.push(listenEvent);
+					}			
+				}
 			}
 		}
 		if(fireEvent != 'dummy'){
