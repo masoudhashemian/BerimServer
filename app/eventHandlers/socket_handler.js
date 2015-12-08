@@ -119,6 +119,27 @@ module.exports = function(io ,socket, clients){
 		);		
 	});
 	
+	socket.on('getPlacesRequest', function(data){
+		request.get(
+			'http://localhost:'+settings.port+'/place/get_places',			
+			function (error, response, body) {
+				if (!error && response.statusCode == 200) {
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = body;					
+					socket.emit('getPlacesResponse', res);
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = body;									
+					socket.emit('addPlaceResponse', res);
+				}
+			}
+		);		
+	});
+	
 	//events
 	socket.on('sendMessageRequest', function(msg){
 		msg.senderId = socket.userId;

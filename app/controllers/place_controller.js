@@ -15,5 +15,15 @@ module.exports ={
 							  console.log(place.serialize());
 							  return res.send(200, place.serialize());  	  
 						});
+					},
+					getList: function(req, res, next){
+						req.models.place.find({}, function(err, places){
+							if(err)
+							{
+								helpers.reportErrors(res, next, err);
+							}
+							console.log('found '+places.length+' places!');							
+							return res.send(200, places);
+						});
 					}
 				};
