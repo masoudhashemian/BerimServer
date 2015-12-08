@@ -12,4 +12,5 @@ module.exports = function (app) {
   app.post('/chat/add_message'              ,controllers.message.add);
   app.post('/chat/change_message_status'    ,controllers.message.changeStatus);
   app.post('/chat/get_chat_list'    ,controllers.message.getChatList);
+  app.post('/place/add_place'       ,controllers.place.register);
 };

@@ -58,7 +58,7 @@ module.exports = function(io ,socket, clients){
 								error = true;
 								res = new Object();
 								res.error = error;
-								res.errorMessage = body;									
+								res.errorMessage = body;								
 								socket.emit('signInResponse', res);
 							}
 						}
@@ -92,6 +92,28 @@ module.exports = function(io ,socket, clients){
 					res.error = error;
 					res.errorMessage = body;									
 					socket.emit('getChatListResponse', res);
+				}
+			}
+		);		
+	});
+	
+	socket.on('addPlaceRequest', function(data){
+		request.post(
+			'http://localhost:'+settings.port+'/place/add_place',
+			{ form: data },
+			function (error, response, body) {
+				if (!error && response.statusCode == 200) {
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = body;					
+					socket.emit('addPlaceResponse', res);
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = body;									
+					socket.emit('addPlaceResponse', res);
 				}
 			}
 		);		
