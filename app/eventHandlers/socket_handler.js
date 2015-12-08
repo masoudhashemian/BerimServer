@@ -140,6 +140,29 @@ module.exports = function(io ,socket, clients){
 		);		
 	});
 	
+	socket.on('addRoomRequest', function(data){		
+		request.post(
+			'http://localhost:'+settings.port+'/room/add_room',			
+			{form : data},
+			function (error, response, body) {
+				if (!error && response.statusCode == 200) {
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = body;					
+					socket.emit('addRoomResponse', res);
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = body;									
+					socket.emit('addRoomResponse', res);
+				}
+			}
+		);		
+	});
+	
+	
 	//events
 	socket.on('sendMessageRequest', function(msg){
 		msg.senderId = socket.userId;

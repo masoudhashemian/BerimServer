@@ -26,7 +26,7 @@ module.exports = function (orm, db)
 				name     : this.name,
 				placeId  : this.placeId,
 				maxUserCount : this.maxUserCount,
-				createDate : this.createDate
+				createDate : this.createDate		
 				};
 			}
 		}
