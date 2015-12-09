@@ -5,6 +5,7 @@ var orm     = require('orm');
 module.exports ={
 					register: function (req, res, next) {					
 						var params = _.pick(req.body, 'password', 'phoneNumber', 'nickName');
+						console.log(req.body);
 						req.models.user.create(params, function (err, user) 
 						{
 							  if(err) 

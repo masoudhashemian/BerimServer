@@ -6,7 +6,8 @@ var settings = require('../../config/settings');
 module.exports = function(io ,socket, clients){	
 
 	//requests
-	socket.on('signUpRequest', function(data){			
+	socket.on('signUpRequest', function(data){	
+		console.log(data);		
 		request.post(
 			'http://localhost:'+settings.port+'/user/sign_up',
 			{ form: data },
@@ -19,13 +20,15 @@ module.exports = function(io ,socket, clients){
 					res = new Object();
 					res.error = error;
 					res.data = user;
+					console.log(res);
 					socket.emit('signUpResponse', res);
 				}else{				
 					error = true;
 					res = new Object();
 					res.error = error;
-					res.errorMessage = body;									
-					socket.emit('signInResponse', res);
+					res.errorMessage = body;	
+					console.log(res);								
+					socket.emit('signUpResponse', res);
 				}
 			}
 		);	
