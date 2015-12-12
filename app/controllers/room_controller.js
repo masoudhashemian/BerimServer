@@ -23,5 +23,16 @@ module.exports ={
 							  console.log(room);
 							  return res.send(200, room.serialize());  	  
 						});
-					}
+					},
+					addUser: function(req, res, next){
+						var params = _.pick(req.body, 'userId', 'roomId');
+						req.models.join.create(params, function(err, join){
+							if(err)
+							{
+								helpers.reportErrors(res, next, err);
+							}
+							console.log(params.userId+' joined to '+params.roomId);
+							return res.send(200, join.serialize());
+						});
+					}					
 				};

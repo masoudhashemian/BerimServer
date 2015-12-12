@@ -5,6 +5,8 @@ var settings = require('../../config/settings');
 
 module.exports = function(io ,socket, clients){	
 
+	onlineUsers = {};
+	
 	//requests
 	socket.on('signUpRequest', function(data){			
 		request.post(
@@ -39,6 +41,7 @@ module.exports = function(io ,socket, clients){
 				if (!error && response.statusCode == 200) {					
 				    user = JSON.parse(body);					
 					socket.userId = user.id;
+					socket.join(user.roomId);
 					request.post(
 						'http://localhost:'+settings.port+'/user/get_rooms',
 						{ form: {userId: user.id}},
@@ -49,6 +52,8 @@ module.exports = function(io ,socket, clients){
 									room = rooms[i];													
 									socket.join(room);
 								}
+								console.log(user.nickName+'signed In!');
+								console.log(io.sockets.adapter.rooms);
 								error = false;
 								res = new Object();
 								res.error = error;
@@ -162,6 +167,51 @@ module.exports = function(io ,socket, clients){
 		);		
 	});
 	
+	socket.on('addUserToRoomRequest', function(data){
+		request.post(
+			'http://localhost:'+settings.port+'/room/add_user_to_room',			
+			{form : data},
+			function (error, response, body) {
+				if (!error && response.statusCode == 200) {					
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = body;					
+					socket.emit('addUserToRoomResponse', res);
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = body;									
+					socket.emit('addUserToRoomResponse', res);
+				}
+			}
+		);
+	});
+
+	socket.on('getRoomsRequest', function(data){
+		data.userId = socket.userId;
+		request.post(
+			'http://localhost:'+settings.port+'/user/get_rooms',			
+			{form : data},
+			function (error, response, body) {
+				if (!error && response.statusCode == 200) {
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = body;					
+					socket.emit('getRoomsResponse', res);
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = body;									
+					socket.emit('getRoomsResponse', res);
+				}
+			}
+		);		
+	});
+	
 	
 	//events
 	socket.on('sendMessageRequest', function(msg){
@@ -172,12 +222,14 @@ module.exports = function(io ,socket, clients){
 			function (error, response, body){							
 				if(!error && response.statusCode == 200){	
 					msg = JSON.parse(body);
-
+					console.log(msg);
 					error = false;
 					res = new Object();
 					res.error = error;
 					res.data = {message: 'Message was recieved at server!'};								
 					socket.emit('sendMessageResponse', res);
+					console.log(socket.rooms);
+					console.log(socket.in(msg.roomId));
 					io.sockets.in(msg.roomId).emit('newMessage', msg);
 				}else{				
 					error = true;
