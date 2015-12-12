@@ -39,7 +39,7 @@ module.exports ={
 									{
 									  return next(err);
 									}
-							  }							 
+							  }									  
 							  message.status = params.status;
 							  message.save(function(err){
 									if(err) 
@@ -68,7 +68,9 @@ module.exports ={
 											}
 										}
 										data = new Object();
-										data.message = message.serialize();									
+										data.message = message.serialize();
+										console.log('in controller');
+										console.log(data.message);
 										data.sender = user.serialize();
 										return res.send(200, data);		
 									});																															

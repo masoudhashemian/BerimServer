@@ -114,7 +114,7 @@ module.exports = function(io ,socket, clients){
 					res = new Object();
 					res.error = error;
 					res.data = {message: 'Message was recieved at server!'};								
-					socket.emit('sendMessageResponse', res);
+					socket.emit('sendMessageResponse', res);					
 					io.sockets.in(msg.roomId).emit('newMessage', msg);
 				}else{				
 					error = true;
@@ -127,14 +127,14 @@ module.exports = function(io ,socket, clients){
 		);				
 	});
 	
-	socket.on('changeMessageStatusRequest', function(msg){		
+	socket.on('changeMessageStatusRequest', function(msg){				
 		request.post(
 			'http://localhost:'+settings.port+'/chat/change_message_status',
 			{ form: msg},
 			function (error, response, body){							
 				if(!error && response.statusCode == 200){	
 					body = JSON.parse(body);
-					msg = body.message;
+					message = body.message;					
 					sender = body.sender;
 
 					error = false;
@@ -144,7 +144,7 @@ module.exports = function(io ,socket, clients){
 					socket.emit('changeMessageStatusResponse', res);			
 					console.log(sender.roomId);
 					console.log(io.sockets.adapter.rooms);
-					io.sockets.in(sender.roomId).emit('changeMessageStatus', msg);
+					io.sockets.in(sender.roomId).emit('changeMessageStatus', message);
 				}else{				
 					error = true;
 					res = new Object();
