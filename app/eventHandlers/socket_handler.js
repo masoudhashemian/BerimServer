@@ -100,6 +100,29 @@ module.exports = function(io ,socket, clients){
 		);		
 	});
 	
+	socket.on('getRoomsRequest', function(data){
+		data.userId = socket.userId;
+		request.post(
+			'http://localhost:'+settings.port+'/user/get_rooms',
+			{ form: data },
+			function (error, response, body) {
+				if (!error && response.statusCode == 200) {
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = body;					
+					socket.emit('getRoomsResponse', res);
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = body;									
+					socket.emit('getRoomsResponse', res);
+				}
+			}
+		);		
+	});
+	
 	//events
 	socket.on('sendMessageRequest', function(msg){
 		msg.senderId = socket.userId;

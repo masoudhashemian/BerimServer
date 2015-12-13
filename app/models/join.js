@@ -3,16 +3,25 @@ var moment = require('moment');
 module.exports = function (orm, db) 
 {
 	var Join = db.define('join', {		
-		userId      : { type: 'number', required: true},
-		roomId : { type: 'number', required: true},
-		date : {type : 'date', time : true}		
+		userId      : { type : 'number', required: true},
+		user        : { type : 'object'},
+		roomId      : { type : 'number', required: true},
+		room        : { type : 'object'},
+		date        : { type : 'date', time : true}		
 	},
 		
 	{   
 		 hooks: {
 					beforeCreate: function (next) {						
-						this.date = Date.now();
-						return next();
+						obj = this;
+						obj.date = Date.now();
+					//	db.models.user.get(obj.userId, function(err, user){
+						//	obj.user = user;
+						//	db.models.room.get(obj.roomId, function(err, room){
+							//	obj.room = room;
+								return next();
+						//	});							
+					//	});						
 					}
 		}  ,	
 		
@@ -22,9 +31,11 @@ module.exports = function (orm, db)
 			{
 				return {
 				id           : this._id,
-				userId     : this.userId,
-				roomId  : this.roomId,				
-				date : this.date
+				userId       : this.userId,
+				roomId       : this.roomId,	
+				//user         : this.user,
+				//room         : this.room,
+				date         : this.date
 				};
 			}
 		}
