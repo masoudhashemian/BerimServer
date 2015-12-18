@@ -8,7 +8,8 @@ module.exports = function (orm, db)
 		roomId : { type: 'number', required: true},
 		text : {type: 'text', required: true},
 		status : {type: 'text', defaultValue: 'deliverAtServer'},				
-		date : {type : 'date', time : true}		
+		date : {type : 'date', time : true},
+		updateStatus : {type : 'boolean'}
 	},
 		
 	{   
@@ -16,12 +17,11 @@ module.exports = function (orm, db)
 					beforeCreate: function (next) {						
 						obj = this;
 						this.date = Date.now();
+						this.updateStatus = false;
 						db.models.user.get(this.senderId, function(err, user){
-							obj.sender = user;	
-							console.log('vvv');
+							obj.sender = user.serialize();								
 							return next();							
-						});						
-						console.log('ddd');
+						});												
 					}
 		}  ,	
 		
@@ -35,7 +35,8 @@ module.exports = function (orm, db)
 				roomId       : this.roomId,
 				text         : this.text,
 				status       : this.status,
-				date         : this.date
+				date         : this.date,
+				updateStatus : this.updateStatus
 				};
 			}
 		}

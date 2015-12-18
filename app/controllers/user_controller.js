@@ -69,6 +69,9 @@ module.exports ={
 					},
 					signIn: function (req, res, next){
 						var params = _.pick(req.body, 'phoneNumber','password');
+						if(params.phoneNumber == null || params.password == null){
+							return next("Password or Phone number must exist!");
+						}
 						req.models.user.find(params, function (err, users) {
 							if(users.length==0)			
 							{								
@@ -88,8 +91,10 @@ module.exports ={
 							for(var i = 0; i < joins.length; i++){
 								join = joins[i];								
 								rooms.push(join.roomId);
-							}						
-							return res.send(200, rooms);
+							}			
+							data = {};
+							data.rooms = rooms;
+							return res.send(200, data);
 						});
 					}
 				};

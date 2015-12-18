@@ -15,8 +15,8 @@ module.exports = {
   reportErrors: function(res, next, err){				
 		if(Array.isArray(err))
 		{
-			console.log({errors: helpers.formatErrors(err) });
-			return res.send(600, {errors: helpers.formatErrors(err) });
+			console.log({errors: this.formatErrors(err) });
+			return res.send(600, {errors: this.formatErrors(err) });
 		}
 		else 
 		{

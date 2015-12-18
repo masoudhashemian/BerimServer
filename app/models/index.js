@@ -8,6 +8,7 @@ function setup(db, cb) {
   require('./room')(orm, db);  
   require('./join')(orm, db);  
   require('./message')(orm, db);  
+  require('./place')(orm, db);
   
   return cb(null, db);
 }
