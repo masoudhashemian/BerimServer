@@ -31,8 +31,11 @@ module.exports ={
 							{
 								helpers.reportErrors(res, next, err);
 							}
-							console.log(params.userId+' joined to '+params.roomId);
-							return res.send(200, join.serialize());
+							try{								
+								return res.send(200, join.serialize());
+							}catch(err){
+								return res.send(600, "An error occurred during joining user to room!");
+							}
 						});
 					}					
 				};

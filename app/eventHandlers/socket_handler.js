@@ -2,32 +2,40 @@
 var request = require('request');
 var orm     = require('orm');
 var settings = require('../../config/settings');
+var helpers = require('./_helpers');
 
-module.exports = function(io ,socket, clients){	
-
-	onlineUsers = {};
+module.exports = function(io ,socket, clients){		
 	
 	//requests
-	socket.on('signUpRequest', function(data){			
+	socket.on('signUpRequest', function(data){	
+		console.log(data);		
 		request.post(
-			'http://localhost:'+settings.port+'/user/sign_up',
+			settings.serverAddress+'/user/sign_up',
 			{ form: data },
 			function (error, response, body) {
+				console.log(settings.serverAddress+'/user/sign_up');
 				if (!error && response.statusCode == 200) {					
 				    user = JSON.parse(body);										
 					socket.userId = user.id;
-					socket.join(user.roomId);
+					socket.join(user.roomId);															
+					clients.set(socket.userId, socket);	
 					error = false;
 					res = new Object();
 					res.error = error;
 					res.data = user;
+					console.log(res);
 					socket.emit('signUpResponse', res);
-				}else{				
+				}else{	
+					try{
+						body = JSON.parse(body);
+					}catch(err){
+						body = "An error occurred during sing up!";
+					}
 					error = true;
 					res = new Object();
 					res.error = error;
-					res.errorMessage = body;									
-					socket.emit('signInResponse', res);
+					res.errorMessage = body;													
+					socket.emit('signUpResponse', res);
 				}
 			}
 		);	
@@ -35,25 +43,25 @@ module.exports = function(io ,socket, clients){
 	
 	socket.on('signInRequest', function(data){	
 		request.post(
-			'http://localhost:'+settings.port+'/user/sign_in',
+			settings.serverAddress+'/user/sign_in',
 			{ form: data },
 			function (error, response, body) {
 				if (!error && response.statusCode == 200) {					
 				    user = JSON.parse(body);					
-					socket.userId = user.id;
-					socket.join(user.roomId);
+					socket.userId = user.id;					
+					clients.set(socket.userId, socket);					
 					request.post(
-						'http://localhost:'+settings.port+'/user/get_rooms',
+						settings.serverAddress+'/user/get_rooms',
 						{ form: {userId: user.id}},
 						function (error, response, body){							
-							if(!error && response.statusCode == 200){	
-								rooms = JSON.parse("[" + body + "]");
+							if(!error && response.statusCode == 200){															
+								body = JSON.parse(body);
+								rooms = body.rooms;
 								for(var i = 0 ; i < rooms.length; i++){
-									room = rooms[i];													
+									room = rooms[i];	
+									console.log(room);
 									socket.join(room);
-								}
-								console.log(user.nickName+'signed In!');
-								console.log(io.sockets.adapter.rooms);
+								}								
 								error = false;
 								res = new Object();
 								res.error = error;
@@ -63,7 +71,7 @@ module.exports = function(io ,socket, clients){
 								error = true;
 								res = new Object();
 								res.error = error;
-								res.errorMessage = body;								
+								res.errorMessage = "Password or Phone number is incorrect!";		
 								socket.emit('signInResponse', res);
 							}
 						}
@@ -72,7 +80,7 @@ module.exports = function(io ,socket, clients){
 					error = true;
 					res = new Object();
 					res.error = error;
-					res.errorMessage = body;									
+					res.errorMessage = "Password or Phone number is incorrect!";									
 					socket.emit('signInResponse', res);
 				}
 			}
@@ -80,22 +88,28 @@ module.exports = function(io ,socket, clients){
 	});
 	
 	socket.on('getChatListRequest', function(data){		
+		responseEvent = 'getChatListResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}
 		data.userId = socket.userId;
 		request.post(
-			'http://localhost:'+settings.port+'/chat/get_chat_list',
+			settings.serverAddress+'/chat/get_chat_list',
 			{ form: data },
 			function (error, response, body) {
 				if (!error && response.statusCode == 200) {
+					body = JSON.parse(body);
+					msgs = body.msgs;
 					error = false;
 					res = new Object();
 					res.error = error;
-					res.data = body;					
+					res.data = msgs;					
 					socket.emit('getChatListResponse', res);
-				}else{				
+				}else{	
 					error = true;
 					res = new Object();
 					res.error = error;
-					res.errorMessage = body;									
+					res.errorMessage = "Message not found!";		
 					socket.emit('getChatListResponse', res);
 				}
 			}
@@ -103,11 +117,16 @@ module.exports = function(io ,socket, clients){
 	});
 	
 	socket.on('addPlaceRequest', function(data){
+		responseEvent = 'addPlaceResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}	
 		request.post(
-			'http://localhost:'+settings.port+'/place/add_place',
+			settings.serverAddress+'/place/add_place',
 			{ form: data },
 			function (error, response, body) {
 				if (!error && response.statusCode == 200) {
+					body = JSON.parse(body);
 					error = false;
 					res = new Object();
 					res.error = error;
@@ -117,7 +136,7 @@ module.exports = function(io ,socket, clients){
 					error = true;
 					res = new Object();
 					res.error = error;
-					res.errorMessage = body;									
+					res.errorMessage = "An error occurred during adding place!";									
 					socket.emit('addPlaceResponse', res);
 				}
 			}
@@ -125,8 +144,12 @@ module.exports = function(io ,socket, clients){
 	});
 	
 	socket.on('getPlacesRequest', function(data){
+		responseEvent = 'getPlacesResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}	
 		request.get(
-			'http://localhost:'+settings.port+'/place/get_places',			
+			settings.serverAddress+'/place/get_places',			
 			function (error, response, body) {
 				if (!error && response.statusCode == 200) {
 					error = false;
@@ -138,7 +161,7 @@ module.exports = function(io ,socket, clients){
 					error = true;
 					res = new Object();
 					res.error = error;
-					res.errorMessage = body;									
+					res.errorMessage = "An error occurred during getting places!";									
 					socket.emit('addPlaceResponse', res);
 				}
 			}
@@ -146,11 +169,16 @@ module.exports = function(io ,socket, clients){
 	});
 	
 	socket.on('addRoomRequest', function(data){		
+		responseEvent = 'addRoomResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}	
 		request.post(
-			'http://localhost:'+settings.port+'/room/add_room',			
+			settings.serverAddress+'/room/add_room',			
 			{form : data},
 			function (error, response, body) {
 				if (!error && response.statusCode == 200) {
+					body = JSON.parse(body);
 					error = false;
 					res = new Object();
 					res.error = error;
@@ -160,7 +188,7 @@ module.exports = function(io ,socket, clients){
 					error = true;
 					res = new Object();
 					res.error = error;
-					res.errorMessage = body;									
+					res.errorMessage = "An error occurred during adding room!";									
 					socket.emit('addRoomResponse', res);
 				}
 			}
@@ -168,11 +196,20 @@ module.exports = function(io ,socket, clients){
 	});
 	
 	socket.on('addUserToRoomRequest', function(data){
+		responseEvent = 'addUserToRoomResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}		
 		request.post(
-			'http://localhost:'+settings.port+'/room/add_user_to_room',			
+			settings.serverAddress+'/room/add_user_to_room',			
 			{form : data},
 			function (error, response, body) {
-				if (!error && response.statusCode == 200) {					
+				if (!error && response.statusCode == 200) {	
+					body = JSON.parse(body);					
+					if(clients.has(body.userId)){
+						userSocket = clients.get(body.userId);
+						userSocket.join(body.roomId);
+					}
 					error = false;
 					res = new Object();
 					res.error = error;
@@ -182,7 +219,7 @@ module.exports = function(io ,socket, clients){
 					error = true;
 					res = new Object();
 					res.error = error;
-					res.errorMessage = body;									
+					res.errorMessage = "An error occurred during adding user to room!";									
 					socket.emit('addUserToRoomResponse', res);
 				}
 			}
@@ -190,10 +227,14 @@ module.exports = function(io ,socket, clients){
 	});
 
 	socket.on('getRoomsRequest', function(data){
+		responseEvent = 'getRoomsResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}		
 		data.userId = socket.userId;
 		request.post(
-			'http://localhost:'+settings.port+'/user/get_rooms',			
-			{form : data},
+			settings.serverAddress+'/user/get_rooms',			
+			{form : data},						
 			function (error, response, body) {
 				if (!error && response.statusCode == 200) {
 					error = false;
@@ -205,75 +246,133 @@ module.exports = function(io ,socket, clients){
 					error = true;
 					res = new Object();
 					res.error = error;
-					res.errorMessage = body;									
+					res.errorMessage = "An error occurred during getting rooms!";									
 					socket.emit('getRoomsResponse', res);
 				}
 			}
 		);		
 	});
 	
+	socket.on('getUpdatedStatusChatListRequest', function(data){
+		responseEvent = 'getUpdatedStatusChatListResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}
+		data.userId = socket.userId;
+		request.post(
+			settings.serverAddress+'/chat/get_updated_status_chat_list',
+			{ form: data},
+			function (error, response, body){							
+				if(!error && response.statusCode == 200){	
+					body = JSON.parse(body);					
+					msgs = body.msgs;
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = msgs;		
+					socket.emit('getUpdatedStatusChatListResponse', res);											
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = "An error occurred during getting updated status chat list!";									
+					socket.emit('getUpdatedStatusChatListResponse', res);
+				}
+			}
+		);		
+	});
 	
 	//events
 	socket.on('sendMessageRequest', function(msg){
+		responseEvent = 'sendMessageResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}	
 		msg.senderId = socket.userId;
 		request.post(
-			'http://localhost:'+settings.port+'/chat/add_message',
+			settings.serverAddress+'/chat/add_message',
 			{ form: msg},
 			function (error, response, body){							
 				if(!error && response.statusCode == 200){	
-					msg = JSON.parse(body);
-					console.log(msg);
+					msg = JSON.parse(body);					
 					error = false;
 					res = new Object();
 					res.error = error;
 					res.data = {message: 'Message was recieved at server!'};								
 					socket.emit('sendMessageResponse', res);
-					console.log(socket.rooms);
-					console.log(socket.in(msg.roomId));
-					io.sockets.in(msg.roomId).emit('newMessage', msg);
+					delete msg.sender.password;
+					delete msg.sender.phoneNumber;					
+					socket.in(msg.roomId).emit('newMessage', msg);
 				}else{				
 					error = true;
 					res = new Object();
 					res.error = error;
-					res.errorMessage = body;									
+					res.errorMessage = "An error occurred during sending message!";									
 					socket.emit('sendMessageResponse', res);
 				}
 			}
 		);				
 	});
 	
-	socket.on('changeMessageStatusRequest', function(msg){		
+	socket.on('changeMessageStatusRequest', function(msg){				
+		responseEvent = 'changeMessageStatusResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}	
 		request.post(
-			'http://localhost:'+settings.port+'/chat/change_message_status',
+			settings.serverAddress+'/chat/change_message_status',
 			{ form: msg},
 			function (error, response, body){							
 				if(!error && response.statusCode == 200){	
-					body = JSON.parse(body);
-					msg = body.message;
-					sender = body.sender;
-
+					message = JSON.parse(body);
+					console.log(message);
 					error = false;
 					res = new Object();
 					res.error = error;
 					res.data = {message: 'Status of message was changed!'};								
-					socket.emit('changeMessageStatusResponse', res);			
-					console.log(sender.roomId);
-					console.log(io.sockets.adapter.rooms);
-					io.sockets.in(sender.roomId).emit('changeMessageStatus', msg);
+					socket.emit('changeMessageStatusResponse', res);						
+					socket.in(message.sender.roomId).emit('changeMessageStatus', message);
 				}else{				
 					error = true;
 					res = new Object();
 					res.error = error;
-					res.errorMessage = body;									
+					res.errorMessage = "An error occurred during changing message status!";									
 					socket.emit('changeMessageStatusResponse', res);
 				}
 			}
 		);			
 	});
 	
+	socket.on('changeMessageStatusGotRequest', function(msg){
+		responseEvent = 'changeMessageStatusGotResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}		
+		request.post(
+			settings.serverAddress+'/chat/change_message_status_got',
+			{ form: msg},
+			function (error, response, body){							
+				if(!error && response.statusCode == 200){	
+					message = JSON.parse(body);					
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = {message: 'Ok!'};								
+					socket.emit('changeMessageStatusGotResponse', res);						
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = "An error occurred during changing message update status!";									
+					socket.emit('changeMessageStatusGotResponse', res);
+				}
+			}
+		);		
+	});
+	
 	socket.on('disconnect', function() {
-		delete clients[socket.id];
-        console.log(socket.id+' leaved!');		
+		clients.remove(socket.userId);
+        console.log(socket.userId+' leaved!');		
     });	
 	
 	socket.on('getOnlineRoomsRequest', function(){				

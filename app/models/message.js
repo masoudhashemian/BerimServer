@@ -4,17 +4,24 @@ module.exports = function (orm, db)
 {
 	var Message = db.define('message', {		
 		senderId      : { type: 'number', required: true},
+		sender      : { type: 'number'},
 		roomId : { type: 'number', required: true},
 		text : {type: 'text', required: true},
 		status : {type: 'text', defaultValue: 'deliverAtServer'},				
-		date : {type : 'date', time : true}		
+		date : {type : 'date', time : true},
+		updateStatus : {type : 'boolean'}
 	},
 		
 	{   
 		 hooks: {
 					beforeCreate: function (next) {						
+						obj = this;
 						this.date = Date.now();
-						return next();
+						this.updateStatus = false;
+						db.models.user.get(this.senderId, function(err, user){
+							obj.sender = user.serialize();								
+							return next();							
+						});												
 					}
 		}  ,	
 		
@@ -24,11 +31,12 @@ module.exports = function (orm, db)
 			{
 				return {
 				id           : this._id,
-				senderId     : this.senderId,
+				sender       : this.sender,	
 				roomId       : this.roomId,
 				text         : this.text,
 				status       : this.status,
-				date         : this.date
+				date         : this.date,
+				updateStatus : this.updateStatus
 				};
 			}
 		}
