@@ -3,6 +3,7 @@ var request = require('request');
 var orm     = require('orm');
 var settings = require('../../config/settings');
 var helpers = require('./_helpers');
+var fs = require('fs');
 
 module.exports = function(io ,socket, clients){		
 	
@@ -41,7 +42,7 @@ module.exports = function(io ,socket, clients){
 		);	
 	});	
 	
-	socket.on('signInRequest', function(data){	
+	socket.on('signInRequest', function(data){			
 		request.post(
 			settings.serverAddress+'/user/sign_in',
 			{ form: data },
@@ -100,6 +101,14 @@ module.exports = function(io ,socket, clients){
 				if (!error && response.statusCode == 200) {
 					body = JSON.parse(body);
 					msgs = body.msgs;
+					console.log('founc:'+msgs.length);
+					for(var i = 0 ; i < msgs.length ; i++){
+						msg = msgs[i];
+						try{
+							msg.file = helpers.loadAttachment(msg);
+							msgs[i] = msg;
+						}catch(err){}						
+					}
 					error = false;
 					res = new Object();
 					res.error = error;
@@ -288,6 +297,19 @@ module.exports = function(io ,socket, clients){
 		if(!helpers.checkLogin(socket, responseEvent)){
 			return;
 		}	
+		try{
+			fileName = helpers.saveAttachment(msg, socket.userId);		
+			if(fileName != null && fileName != 'error'){
+				msg.fileName = fileName;
+			}
+		}catch(err){
+			error = true;
+			res = new Object();
+			res.error = error;
+			res.errorMessage = "An error occurred during saving attachments!";									
+			socket.emit('sendMessageResponse', res);					
+			return;		
+		}
 		msg.senderId = socket.userId;
 		request.post(
 			settings.serverAddress+'/chat/add_message',

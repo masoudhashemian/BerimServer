@@ -15,19 +15,13 @@ $(document).ready(function(){
 			listenEvents = 'dummy';
 		}else{
 			listenEvents = listenEvents.split("-");
-		}		
-		fireMessage = $('#fireMessage').val();
-		if(fireMessage){
-			fireMessage = JSON.parse(fireMessage);		
-		}else{
-			fireMessage = new Object();
-		}
+		}			
 		trigger = $('#trigger').val();		
 		
 		if(fireEvent != 'dummy' && $.inArray(fireEvent, firingEvents) == -1){
 			console.log('listening on : '+fireEvent+'Response');
 			socket.on(fireEvent+'Response',function(res){			
-				console.log(fireEvent+'Response');
+				console.log(fireEvent+'Response');				
 				console.log(res);
 			});
 			firingEvents.push(fireEvent);
@@ -54,10 +48,36 @@ $(document).ready(function(){
 					}			
 				}
 			}
-		}
-		if(fireEvent != 'dummy'){
-			console.log('firing : '+fireEvent+'Request');
-			socket.emit(fireEvent+'Request', fireMessage);		
 		}	
+		file = $('#uploadFile')[0].files[0];		
+		var reader = new FileReader();
+		if(file != null){
+			reader.readAsArrayBuffer(file);
+		}else{
+			fireMessage = $('#fireMessage').val();
+			if(fireMessage){
+				fireMessage = JSON.parse(fireMessage);		
+			}else{
+				fireMessage = new Object();
+			}
+			if(fireEvent != 'dummy'){				
+				socket.emit(fireEvent+'Request', fireMessage);		
+			}				
+		}
+
+		reader.onload = function(e) {
+			var arrayBuffer = reader.result;
+			fireMessage = $('#fireMessage').val();
+			if(fireMessage){
+				fireMessage = JSON.parse(fireMessage);		
+			}else{
+				fireMessage = new Object();
+			}
+			fireMessage.file = arrayBuffer;
+			fireMessage.fileExt = 'jpeg';
+			if(fireEvent != 'dummy'){				
+				socket.emit(fireEvent+'Request', fireMessage);		
+			}		
+		}			
 	});
 });

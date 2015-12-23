@@ -9,7 +9,8 @@ module.exports = function (orm, db)
 		text : {type: 'text', required: true},
 		status : {type: 'text', defaultValue: 'deliverAtServer'},				
 		date : {type : 'date', time : true},
-		updateStatus : {type : 'boolean'}
+		updateStatus : {type : 'boolean'},
+		fileName     : {type : 'text'}
 	},
 		
 	{   
@@ -36,7 +37,8 @@ module.exports = function (orm, db)
 				text         : this.text,
 				status       : this.status,
 				date         : this.date,
-				updateStatus : this.updateStatus
+				updateStatus : this.updateStatus,
+				fileName     : this.fileName
 				};
 			}
 		}

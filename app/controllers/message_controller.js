@@ -4,21 +4,13 @@ var orm     = require('orm');
 
 module.exports ={
 					add: function (req, res, next) {					
-						var params = _.pick(req.body, 'senderId', 'roomId', 'text');
+						var params = _.pick(req.body, 'senderId', 'roomId', 'text', 'fileName');
 						req.models.message.create(params, function (err, message) 
 						{
-							  if(err) 
+							  if(err || message == null) 
 							  {
-									if(Array.isArray(err))
-									{
-									  console.log({errors: helpers.formatErrors(err) });
-									  return res.send(600, {errors: helpers.formatErrors(err) });
-									}
-									else 
-									{
-									  return next(err);
-									}
-							  }							 							  
+								return next("Message can not be added!");
+							  }								 							  
 							  console.log('message added!');
 							  console.log(message.serialize());
 							  return res.send(200, message.serialize());  	  
