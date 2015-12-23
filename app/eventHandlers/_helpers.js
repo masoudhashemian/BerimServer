@@ -1,4 +1,7 @@
 
+var settings = require('../../config/settings');
+var fs = require('fs');
+
 module.exports = {
   checkLogin: function(socket,responseEvent) {
 	console.log(socket.userId);
@@ -11,5 +14,21 @@ module.exports = {
 		return false;
 	}
 	return true;
+  },
+  saveAttachment: function(data, userId){
+	file = data.file;
+	if(file != null){
+		ext = data.fileExt;				
+		file = new Uint8Array(file);
+		fileName = new Date().getTime() + '-' +  userId + '.'+ext;						
+		fs.appendFileSync(settings.path+'/uploads/'+fileName, new Buffer(file));						
+		return fileName;		
+	}
+  },
+  loadAttachment: function(data){
+	fileName = data.fileName;
+	if(fileName != null){
+		return fs.readFileSync(settings.path+'/uploads/'+fileName);
+	}
   }
 };
