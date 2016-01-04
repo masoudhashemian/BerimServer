@@ -291,6 +291,67 @@ module.exports = function(io ,socket, clients){
 		);		
 	});
 	
+	socket.on('getUserInfoRequest', function(data){
+		responseEvent = 'getUserInfoResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}		
+		request.post(
+			settings.serverAddress+'/user/get_user_info',
+			{ form: data},
+			function (error, response, body){							
+				if(!error && response.statusCode == 200){	
+					body = JSON.parse(body);					
+					user = body.user;
+					delete user.password;
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = user;							
+					socket.emit('getUserInfoResponse', res);											
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = "An error occurred during getting user info!";									
+					socket.emit('getUserInfoResponse', res);
+				}
+			}
+		);		
+	});	
+	
+	socket.on('searchUserRequest', function(data){
+		responseEvent = 'searchUserResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}		
+		request.post(
+			settings.serverAddress+'/user/search_user',
+			{ form: data},
+			function (error, response, body){							
+				if(!error && response.statusCode == 200){	
+					body = JSON.parse(body);					
+					users = body.users;
+					for (var i = 0 ; i < users.length ; i++){
+						user = users[i];
+						delete user.password;
+					}
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = users;							
+					socket.emit('searchUserResponse', res);											
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = "An error occurred during searching user!";									
+					socket.emit('searchUserResponse', res);
+				}
+			}
+		);		
+	});		
+	
 	//events
 	socket.on('sendMessageRequest', function(msg){
 		responseEvent = 'sendMessageResponse';

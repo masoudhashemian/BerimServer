@@ -17,4 +17,6 @@ module.exports = function (app) {
   app.post('/place/add_place'       ,controllers.place.register);
   app.get('/place/get_places'       ,controllers.place.getList);
   app.post('/room/add_user_to_room' ,controllers.room.addUser);
+  app.post('/user/get_user_info'    ,controllers.user.getUserInfo);
+  app.post('/user/search_user'      ,controllers.user.searchUser);
 };

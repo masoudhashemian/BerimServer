@@ -96,5 +96,38 @@ module.exports ={
 							data.rooms = rooms;
 							return res.send(200, data);
 						});
+					},
+					getUserInfo: function(req, res, next){
+						var params = _.pick(req.body, 'phoneNumber');
+						req.models.user.find(params, function(err, users){		
+							if(users.length==0)			
+							{								
+								return res.send(600, 'Phone number not found!');															
+							}else{
+								user = users[0];								
+								console.log('user found!');
+								console.log(user.serialize());	
+								data = {};
+								data.user = user.serialize();
+								return res.send(200, data);
+							}
+						});						
+					},
+					searchUser: function(req, res, next){
+						var params = _.pick(req.body, 'phoneNumber', 'nickName');
+						req.models.user.find(params, function(err, users){		
+							if(users.length==0)			
+							{								
+								return res.send(600, 'No user found!');															
+							}else{
+								for(var i = 0 ; i < users.length ; i++){
+									users[i] = users[i].serialize();
+								}
+								console.log(users.length + ' users found!');								
+								data = {};
+								data.users = users;
+								return res.send(200, data);
+							}
+						});						
 					}
 				};
