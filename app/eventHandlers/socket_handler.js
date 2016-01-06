@@ -4,6 +4,7 @@ var orm     = require('orm');
 var settings = require('../../config/settings');
 var helpers = require('./_helpers');
 var fs = require('fs');
+var md5 = require('md5');
 
 module.exports = function(io ,socket, clients){		
 	
@@ -25,6 +26,7 @@ module.exports = function(io ,socket, clients){
 					res.error = error;
 					res.data = user;
 					console.log(res);
+					//res.data = md5(res.data);
 					socket.emit('signUpResponse', res);
 				}else{	
 					try{
@@ -66,7 +68,8 @@ module.exports = function(io ,socket, clients){
 								error = false;
 								res = new Object();
 								res.error = error;
-								res.data = user;								
+								res.data = user;	
+								//res.data = md5(res.data);
 								socket.emit('signInResponse', res);								
 							}else{				
 								error = true;
@@ -112,7 +115,8 @@ module.exports = function(io ,socket, clients){
 					error = false;
 					res = new Object();
 					res.error = error;
-					res.data = msgs;					
+					res.data = msgs;		
+					//res.data = md5(res.data);
 					socket.emit('getChatListResponse', res);
 				}else{	
 					error = true;
@@ -139,7 +143,8 @@ module.exports = function(io ,socket, clients){
 					error = false;
 					res = new Object();
 					res.error = error;
-					res.data = body;					
+					res.data = body;		
+					//res.data = md5(res.data);
 					socket.emit('addPlaceResponse', res);
 				}else{				
 					error = true;
@@ -162,9 +167,11 @@ module.exports = function(io ,socket, clients){
 			function (error, response, body) {
 				if (!error && response.statusCode == 200) {
 					error = false;
+					places = JSON.parse(body).places;
 					res = new Object();
 					res.error = error;
-					res.data = body;					
+					res.data = places;		
+					//res.data = md5(res.data);
 					socket.emit('getPlacesResponse', res);
 				}else{				
 					error = true;
@@ -191,7 +198,8 @@ module.exports = function(io ,socket, clients){
 					error = false;
 					res = new Object();
 					res.error = error;
-					res.data = body;					
+					res.data = body;		
+					//res.data = md5(res.data);
 					socket.emit('addRoomResponse', res);
 				}else{				
 					error = true;
@@ -222,7 +230,8 @@ module.exports = function(io ,socket, clients){
 					error = false;
 					res = new Object();
 					res.error = error;
-					res.data = body;					
+					res.data = body;		
+					//res.data = md5(res.data);
 					socket.emit('addUserToRoomResponse', res);
 				}else{				
 					error = true;
@@ -246,10 +255,12 @@ module.exports = function(io ,socket, clients){
 			{form : data},						
 			function (error, response, body) {
 				if (!error && response.statusCode == 200) {
+					rooms = JSON.parse(body).rooms;
 					error = false;
 					res = new Object();
 					res.error = error;
-					res.data = body;					
+					res.data = rooms;	
+					//res.data = md5(res.data);
 					socket.emit('getRoomsResponse', res);
 				}else{				
 					error = true;
@@ -278,7 +289,8 @@ module.exports = function(io ,socket, clients){
 					error = false;
 					res = new Object();
 					res.error = error;
-					res.data = msgs;		
+					res.data = msgs;	
+					//res.data = md5(res.data);
 					socket.emit('getUpdatedStatusChatListResponse', res);											
 				}else{				
 					error = true;
@@ -307,7 +319,8 @@ module.exports = function(io ,socket, clients){
 					error = false;
 					res = new Object();
 					res.error = error;
-					res.data = user;							
+					res.data = user;
+					//res.data = md5(res.data);
 					socket.emit('getUserInfoResponse', res);											
 				}else{				
 					error = true;
@@ -339,7 +352,8 @@ module.exports = function(io ,socket, clients){
 					error = false;
 					res = new Object();
 					res.error = error;
-					res.data = users;							
+					res.data = users;	
+					//res.data = md5(res.data);
 					socket.emit('searchUserResponse', res);											
 				}else{				
 					error = true;
@@ -382,10 +396,18 @@ module.exports = function(io ,socket, clients){
 					res = new Object();
 					res.error = error;
 					res.data = {message: 'Message was recieved at server!'};								
+					//res.data = md5(res.data);
 					socket.emit('sendMessageResponse', res);
 					delete msg.sender.password;
-					delete msg.sender.phoneNumber;					
-					socket.in(msg.roomId).emit('newMessage', msg);
+					//delete msg.sender.phoneNumber;					
+					console.log('before encryption : ');
+					console.log(msg);
+					//msg = helpers.encryptMessage(md5, msg);
+					receiver = msg.roomId;
+					//msg = md5(msg);
+					console.log('after encryption : ');
+					console.log(msg);
+					socket.in(receiver).emit('newMessage', msg);
 				}else{				
 					error = true;
 					res = new Object();
@@ -413,8 +435,13 @@ module.exports = function(io ,socket, clients){
 					res = new Object();
 					res.error = error;
 					res.data = {message: 'Status of message was changed!'};								
+					//res.data = md5(res.data);
 					socket.emit('changeMessageStatusResponse', res);						
-					socket.in(message.sender.roomId).emit('changeMessageStatus', message);
+					//message = helpers.encryptMessage(md5, message);
+					receiver = message.sender.roomId;
+					delete message.sender.password;
+					//message = md5(message);
+					socket.in(receiver).emit('changeMessageStatus', message);
 				}else{				
 					error = true;
 					res = new Object();
@@ -441,6 +468,7 @@ module.exports = function(io ,socket, clients){
 					res = new Object();
 					res.error = error;
 					res.data = {message: 'Ok!'};								
+					//res.data = md5(res.data);
 					socket.emit('changeMessageStatusGotResponse', res);						
 				}else{				
 					error = true;

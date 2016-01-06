@@ -76,7 +76,9 @@ module.exports ={
 									join = joins[i];
 									join = join.serialize();
 									orStatement.push({roomId : join.roomId});
-								}								
+								}				
+								console.log(orStatement);
+								console.log(msg.date);
 								//$or : [{senderId : user._id}, {roomId : user.getRoomId()}]
 								req.models.message.find({date: {$gt: msg.date}, $or : orStatement}, function(err, msgs){
 									if(err){

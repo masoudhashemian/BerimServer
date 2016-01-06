@@ -89,8 +89,8 @@ module.exports ={
 						req.models.join.find(params, function(err, joins){														
 							var rooms = new Array();
 							for(var i = 0; i < joins.length; i++){
-								join = joins[i];								
-								rooms.push(join.roomId);
+								join = joins[i];										
+								rooms.push(join.room);
 							}			
 							data = {};
 							data.rooms = rooms;

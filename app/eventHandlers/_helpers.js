@@ -30,5 +30,16 @@ module.exports = {
 	if(fileName != null){
 		return fs.readFileSync(settings.path+'/uploads/'+fileName);
 	}
+  },
+  encryptMessage: function(md5, msg){
+	console.log('in encryption : ')
+	for (var key in msg) {		
+		if (msg.hasOwnProperty(key)) {
+			console.log(key);
+			console.log(msg[key]);
+			msg[key] = md5(msg[key]);
+		}
+	}
+	return msg;
   }
 };
