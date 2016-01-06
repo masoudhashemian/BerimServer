@@ -22,8 +22,13 @@ module.exports ={
 							{
 								helpers.reportErrors(res, next, err);
 							}
+							for(var i = 0 ; i < places.length ; i++){
+								places[i] = places[i].serialize();
+							}
 							console.log('found '+places.length+' places!');							
-							return res.send(200, places);
+							data = {};
+							data.places = places;
+							return res.send(200, data);
 						});
 					}
 				};
