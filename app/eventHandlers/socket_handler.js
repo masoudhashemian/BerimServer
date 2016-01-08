@@ -62,9 +62,10 @@ module.exports = function(io ,socket, clients){
 								rooms = body.rooms;
 								for(var i = 0 ; i < rooms.length; i++){
 									room = rooms[i];	
-									console.log(room);
-									socket.join(room);
-								}								
+									console.log(room.id);									
+									socket.join(room.id);
+								}	
+								
 								error = false;
 								res = new Object();
 								res.error = error;
@@ -391,7 +392,11 @@ module.exports = function(io ,socket, clients){
 			{ form: msg},
 			function (error, response, body){							
 				if(!error && response.statusCode == 200){	
-					msg = JSON.parse(body);					
+					msg = JSON.parse(body);		
+					file = helpers.loadAttachment(msg);
+					if(file != null){
+						msg.file = file;
+					}
 					error = false;
 					res = new Object();
 					res.error = error;
