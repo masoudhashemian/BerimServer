@@ -11,13 +11,11 @@ var HashMap = require('hashmap');
 module.exports = function(io ,socket, clients){		
 	
 	//requests
-	socket.on('signUpRequest', function(data){	
-		console.log(data);		
+	socket.on('signUpRequest', function(data){			
 		request.post(
 			settings.serverAddress+'/user/sign_up',
 			{ form: data },
-			function (error, response, body) {
-				console.log(settings.serverAddress+'/user/sign_up');
+			function (error, response, body) {				
 				if (!error && response.statusCode == 200) {					
 				    user = JSON.parse(body);										
 					socket.userId = user.id;
@@ -136,7 +134,7 @@ module.exports = function(io ,socket, clients){
 		responseEvent = 'addPlaceResponse';
 		if(!helpers.checkLogin(socket, responseEvent)){
 			return;
-		}	
+		}
 		request.post(
 			settings.serverAddress+'/place/add_place',
 			{ form: data },
@@ -319,6 +317,11 @@ module.exports = function(io ,socket, clients){
 					body = JSON.parse(body);					
 					user = body.user;
 					delete user.password;
+					if(clients.has(user.id)){
+						user.status = "online";
+					}else{
+						user.status = "offline";
+					}
 					error = false;
 					res = new Object();
 					res.error = error;
@@ -560,8 +563,20 @@ module.exports = function(io ,socket, clients){
 	});		
 	
 	socket.on('disconnect', function() {
-		clients.remove(socket.userId);
-        console.log(socket.userId+' leaved!');		
+		if(socket.userId != null){
+			clients.remove(socket.userId);
+			console.log(socket.userId+' leaved!');		
+			data = {};
+			data.userId = socket.userId;
+			request.post(
+				settings.serverAddress+'/user/update_last_seen',
+				{ form: data},
+				function (error, response, body){				
+					user = JSON.parse(body);
+					console.log(socket.userId+' last seen : '+user.lastSeen);
+				}
+			);			
+		}
     });	
 	
 	socket.on('getOnlineRoomsRequest', function(){				

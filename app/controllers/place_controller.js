@@ -3,7 +3,7 @@ var helpers = require('./_helpers');
 var orm     = require('orm');
 
 module.exports ={
-					register: function (req, res, next) {					
+					register: function (req, res, next) {							
 						var params = _.pick(req.body, 'name');
 						req.models.place.create(params, function (err, place) 
 						{

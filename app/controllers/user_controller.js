@@ -3,7 +3,7 @@ var helpers = require('./_helpers');
 var orm     = require('orm');
 
 module.exports ={
-					register: function (req, res, next) {					
+					register: function (req, res, next) {								
 						var params = _.pick(req.body, 'password', 'phoneNumber', 'nickName');
 						console.log(req.body);
 						req.models.user.create(params, function (err, user) 
@@ -129,5 +129,20 @@ module.exports ={
 								return res.send(200, data);
 							}
 						});						
-					}
+					},
+					updateLastSeen: function(req, res, next){
+						var params = _.pick(req.body, 'userId');
+						req.models.user.get(params.userId, function(err, user){		
+							if(user == null)			
+							{								
+								return res.send(600, 'No user found!');															
+							}else{
+								user.lastSeen = Date.now();								
+								user.save(function(err){
+									return next('An error occured during saving last seen of user!');
+								});
+								return res.send(200, user.serialize());
+							}
+						});						
+					}					
 				};

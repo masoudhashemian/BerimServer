@@ -6,7 +6,8 @@ module.exports = function (orm, db)
 		password      : { type: 'text', required: true},
 		phoneNumber : { type: 'number', required: true, unique:true},
 		nickName : {type : 'text'},
-		room     : {type : 'object'}
+		room     : {type : 'object'},
+		lastSeen : {type : 'date', time : true}
 	},
 		
 	{   
@@ -48,7 +49,8 @@ module.exports = function (orm, db)
 					password     : this.password,
 					phoneNumber  : this.phoneNumber,
 					nickName     : this.nickName,					
-					roomId       : this.room._id
+					roomId       : this.room._id,
+					lastSeen     : this.lastSeen
 				};
 			},
 			getRoomId: function(){
