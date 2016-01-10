@@ -563,7 +563,6 @@ module.exports = function(io ,socket, clients){
 	});		
 	
 	socket.on('disconnect', function() {
-<<<<<<< HEAD
 		if(socket.userId != null){
 			clients.remove(socket.userId);
 			console.log(socket.userId+' leaved!');		
@@ -578,20 +577,6 @@ module.exports = function(io ,socket, clients){
 				}
 			);			
 		}
-=======
-		clients.remove(socket.userId);
-        console.log(socket.userId+' leaved!');		
-		data = {};
-		data.userId = socket.userId;
-		request.post(
-			settings.serverAddress+'/user/update_last_seen',
-			{ form: data},
-			function (error, response, body){				
-				//user = JSON.parse(body);
-				console.log(socket.userId+'\'s last seen : '+user.lastSeen);
-			}
-		);		
->>>>>>> d98f77e2d7ab2dfc664258920f22250540498d85
     });	
 	
 	socket.on('getOnlineRoomsRequest', function(){				

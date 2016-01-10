@@ -2,7 +2,7 @@ var path       = require('path');
 
 var settings = {
   path       : path.normalize(path.join(__dirname, '..')),
-  port       : process.env.NODE_PORT || 4000,
+  port       : process.env.NODE_PORT || 3000,
   serverAddress : "http://localhost:3000",
   database   : {
     protocol : "mongodb", // or "mysql"
