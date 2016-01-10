@@ -22,5 +22,9 @@ module.exports = function (app) {
   app.post('/user/get_user_info'    ,controllers.user.getUserInfo);
   app.post('/user/search_user'      ,controllers.user.searchUser);
   app.get('/uploads'                ,controllers.upload.sendFile);
+<<<<<<< HEAD
   app.post('/user/update_last_seen' ,controllers.user.updateLastSeen);
+=======
+  //app.post('/user/update_last_seen'  ,controllers.user.updateLastSeen);
+>>>>>>> d98f77e2d7ab2dfc664258920f22250540498d85
 };

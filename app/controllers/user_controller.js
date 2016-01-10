@@ -129,20 +129,38 @@ module.exports ={
 								return res.send(200, data);
 							}
 						});						
+<<<<<<< HEAD
 					},
 					updateLastSeen: function(req, res, next){
 						var params = _.pick(req.body, 'userId');
+=======
+					}
+					/*updateLastSeen: function(req, res, next){
+						var params = _.pick(req.body, 'userId');						
+>>>>>>> d98f77e2d7ab2dfc664258920f22250540498d85
 						req.models.user.get(params.userId, function(err, user){		
 							if(user == null)			
 							{								
 								return res.send(600, 'No user found!');															
 							}else{
+<<<<<<< HEAD
 								user.lastSeen = Date.now();								
 								user.save(function(err){
 									return next('An error occured during saving last seen of user!');
+=======
+								user.lastSeen = Date.now();
+								user.save(function(error){
+									if(error){
+										return next('An error occured during saving last seen for user!');
+									}
+>>>>>>> d98f77e2d7ab2dfc664258920f22250540498d85
 								});
 								return res.send(200, user.serialize());
 							}
 						});						
+<<<<<<< HEAD
 					}					
+=======
+					}*/
+>>>>>>> d98f77e2d7ab2dfc664258920f22250540498d85
 				};

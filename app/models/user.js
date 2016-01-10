@@ -6,8 +6,13 @@ module.exports = function (orm, db)
 		password      : { type: 'text', required: true},
 		phoneNumber : { type: 'number', required: true, unique:true},
 		nickName : {type : 'text'},
+<<<<<<< HEAD
 		room     : {type : 'object'},
 		lastSeen : {type : 'date', time : true}
+=======
+		room     : {type : 'object'}
+		//lastSeen :  {type : 'date', time : true}
+>>>>>>> d98f77e2d7ab2dfc664258920f22250540498d85
 	},
 		
 	{   
@@ -49,8 +54,13 @@ module.exports = function (orm, db)
 					password     : this.password,
 					phoneNumber  : this.phoneNumber,
 					nickName     : this.nickName,					
+<<<<<<< HEAD
 					roomId       : this.room._id,
 					lastSeen     : this.lastSeen
+=======
+					roomId       : this.room._id
+				//	lastSeen     : this.lastSeen
+>>>>>>> d98f77e2d7ab2dfc664258920f22250540498d85
 				};
 			},
 			getRoomId: function(){
