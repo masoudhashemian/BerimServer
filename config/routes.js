@@ -19,4 +19,5 @@ module.exports = function (app) {
   app.post('/room/add_user_to_room' ,controllers.room.addUser);
   app.post('/user/get_user_info'    ,controllers.user.getUserInfo);
   app.post('/user/search_user'      ,controllers.user.searchUser);
+  app.get('/uploads'                ,controllers.upload.sendFile);
 };

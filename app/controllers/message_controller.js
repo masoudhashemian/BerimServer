@@ -4,7 +4,7 @@ var orm     = require('orm');
 
 module.exports ={
 					add: function (req, res, next) {					
-						var params = _.pick(req.body, 'senderId', 'roomId', 'text', 'fileName');
+						var params = _.pick(req.body, 'senderId', 'roomId', 'text', 'fileAddress');
 						req.models.message.create(params, function (err, message) 
 						{
 							  if(err || message == null) 

@@ -10,7 +10,7 @@ module.exports = function (orm, db)
 		status : {type: 'text', defaultValue: 'deliverAtServer'},				
 		date : {type : 'date', time : true},
 		updateStatus : {type : 'boolean'},
-		fileName     : {type : 'text'}
+		fileAddress     : {type : 'text'}
 	},
 		
 	{   
@@ -38,7 +38,7 @@ module.exports = function (orm, db)
 				status       : this.status,
 				date         : this.date,
 				updateStatus : this.updateStatus,
-				fileName     : this.fileName
+				fileAddress     : this.fileAddress
 				};
 			}
 		}

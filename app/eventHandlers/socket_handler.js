@@ -5,6 +5,7 @@ var settings = require('../../config/settings');
 var helpers = require('./_helpers');
 var fs = require('fs');
 var md5 = require('md5');
+var ss = require('socket.io-stream');
 
 module.exports = function(io ,socket, clients){		
 	
@@ -106,13 +107,13 @@ module.exports = function(io ,socket, clients){
 					body = JSON.parse(body);
 					msgs = body.msgs;
 					console.log('founc:'+msgs.length);
-					for(var i = 0 ; i < msgs.length ; i++){
+					/*for(var i = 0 ; i < msgs.length ; i++){
 						msg = msgs[i];
 						try{
 							msg.file = helpers.loadAttachment(msg);
 							msgs[i] = msg;
 						}catch(err){}						
-					}
+					}*/
 					error = false;
 					res = new Object();
 					res.error = error;
@@ -368,12 +369,12 @@ module.exports = function(io ,socket, clients){
 	});		
 	
 	//events
-	socket.on('sendMessageRequest', function(msg){
+	ss(socket).on('sendMessageRequest', function(stream, msg){		
 		responseEvent = 'sendMessageResponse';
 		if(!helpers.checkLogin(socket, responseEvent)){
 			return;
 		}	
-		try{
+		/*try{
 			fileName = helpers.saveAttachment(msg, socket.userId);		
 			if(fileName != null && fileName != 'error'){
 				msg.fileName = fileName;
@@ -385,6 +386,15 @@ module.exports = function(io ,socket, clients){
 			res.errorMessage = "An error occurred during saving attachments!";									
 			socket.emit('sendMessageResponse', res);					
 			return;		
+		}*/
+		if(msg.fileExt != null){
+			fileName = new Date().getTime() + '-' +  socket.userId + '.'+msg.fileExt;
+			console.log('streaming...');
+			stream.pipe(fs.createWriteStream(settings.path+'/uploads/'+fileName));
+			console.log('done!');
+			console.log('fileAddress : ');
+			msg.fileAddress = settings.serverAddress+'/uploads/?fileName='+fileName;
+			console.log(msg.fileAddress);
 		}
 		msg.senderId = socket.userId;
 		request.post(
@@ -393,10 +403,10 @@ module.exports = function(io ,socket, clients){
 			function (error, response, body){							
 				if(!error && response.statusCode == 200){	
 					msg = JSON.parse(body);		
-					file = helpers.loadAttachment(msg);
+					/*file = helpers.loadAttachment(msg);
 					if(file != null){
 						msg.file = file;
-					}
+					}*/
 					error = false;
 					res = new Object();
 					res.error = error;
@@ -405,13 +415,13 @@ module.exports = function(io ,socket, clients){
 					socket.emit('sendMessageResponse', res);
 					delete msg.sender.password;
 					//delete msg.sender.phoneNumber;					
-					console.log('before encryption : ');
-					console.log(msg);
+					//console.log('before encryption : ');
+					//console.log(msg);
 					//msg = helpers.encryptMessage(md5, msg);
 					receiver = msg.roomId;
 					//msg = md5(msg);
-					console.log('after encryption : ');
-					console.log(msg);
+					//console.log('after encryption : ');
+					//console.log(msg);
 					socket.in(receiver).emit('newMessage', msg);
 				}else{				
 					error = true;

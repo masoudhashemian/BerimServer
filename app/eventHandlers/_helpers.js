@@ -15,7 +15,7 @@ module.exports = {
 	}
 	return true;
   },
-  saveAttachment: function(data, userId){
+  saveAttachment: function(data, userId){	
 	file = data.file;
 	if(file != null){
 		ext = data.fileExt;				

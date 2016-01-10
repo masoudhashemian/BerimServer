@@ -50,9 +50,22 @@ $(document).ready(function(){
 			}
 		}	
 		file = $('#uploadFile')[0].files[0];		
-		var reader = new FileReader();
+		stream = ss.createStream();
+		//var reader = new FileReader();
 		if(file != null){
-			reader.readAsArrayBuffer(file);
+		//	reader.readAsArrayBuffer(file);
+			fireMessage = $('#fireMessage').val();
+			if(fireMessage){
+				fireMessage = JSON.parse(fireMessage);		
+			}else{
+				fireMessage = new Object();
+			}		
+			fireMessage.fileExt = 'jpeg';
+			if(fireEvent != 'dummy'){				
+				//socket.emit(fireEvent+'Request', fireMessage);		
+				ss(socket).emit(fireEvent+'Request', stream, fireMessage);
+				ss.createBlobReadStream(file).pipe(stream);
+			}			
 		}else{
 			fireMessage = $('#fireMessage').val();
 			if(fireMessage){
@@ -60,12 +73,16 @@ $(document).ready(function(){
 			}else{
 				fireMessage = new Object();
 			}
-			if(fireEvent != 'dummy'){				
-				socket.emit(fireEvent+'Request', fireMessage);		
+			if(fireEvent != 'dummy'){		
+				if(fireEvent == 'sendMessage'){					
+					ss(socket).emit(fireEvent+'Request', stream, fireMessage);		
+				}else{
+					socket.emit(fireEvent+'Request', fireMessage);		
+				}
 			}				
 		}
 
-		reader.onload = function(e) {
+		/*reader.onload = function(e) {
 			var arrayBuffer = reader.result;
 			fireMessage = $('#fireMessage').val();
 			if(fireMessage){
@@ -78,6 +95,6 @@ $(document).ready(function(){
 			if(fireEvent != 'dummy'){				
 				socket.emit(fireEvent+'Request', fireMessage);		
 			}		
-		}			
+		}*/			
 	});
 });
