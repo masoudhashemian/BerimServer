@@ -6,6 +6,7 @@ var helpers = require('./_helpers');
 var fs = require('fs');
 var md5 = require('md5');
 var ss = require('socket.io-stream');
+var HashMap = require('hashmap');
 
 module.exports = function(io ,socket, clients){		
 	
@@ -468,6 +469,40 @@ module.exports = function(io ,socket, clients){
 		);			
 	});
 	
+	socket.on('bulkChangeMessageStatusRequest', function(data){				
+		responseEvent = 'bulkChangeMessageStatusResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}	
+		request.post(
+			settings.serverAddress+'/chat/bulk_change_message_status',
+			{ form: data},
+			function (error, response, body){							
+				if(!error && response.statusCode == 200){	
+					body = JSON.parse(body);
+					msgsMap = body.msgsMap;
+					msgsMap = new HashMap(msgsMap);
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = {message: 'Status of messages was changed!'};					
+					//res.data = md5(res.data);
+					socket.emit('bulkChangeMessageStatusResponse', res);											
+					msgsMap.forEach(function(msgs, senderRoomId){																		
+						//msgs = md5(msgs);					
+						socket.in(senderRoomId).emit('bulkChangeMessageStatus', msgs);
+					});
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = "An error occurred during changing messages' status!";									
+					socket.emit('bulkChangeMessageStatusResponse', res);
+				}
+			}
+		);			
+	});	
+	
 	socket.on('changeMessageStatusGotRequest', function(msg){
 		responseEvent = 'changeMessageStatusGotResponse';
 		if(!helpers.checkLogin(socket, responseEvent)){
@@ -494,7 +529,35 @@ module.exports = function(io ,socket, clients){
 				}
 			}
 		);		
-	});
+	});	
+	
+	socket.on('bulkChangeMessageStatusGotRequest', function(data){
+		responseEvent = 'bulkChangeMessageStatusGotResponse';
+		/*if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}*/		
+		request.post(
+			settings.serverAddress+'/chat/bulk_change_message_status_got',
+			{ form: data},
+			function (error, response, body){							
+				if(!error && response.statusCode == 200){	
+					body = JSON.parse(body);					
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = {message: 'Ok!'};								
+					//res.data = md5(res.data);
+					socket.emit('bulkChangeMessageStatusGotResponse', res);						
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = "An error occurred during changing messages' update status!";									
+					socket.emit('bulkChangeMessageStatusGotResponse', res);
+				}
+			}
+		);		
+	});		
 	
 	socket.on('disconnect', function() {
 		clients.remove(socket.userId);

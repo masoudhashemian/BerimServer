@@ -1,6 +1,7 @@
 var _       = require('lodash');
 var helpers = require('./_helpers');
 var orm     = require('orm');
+var HashMap = require('hashmap');
 
 module.exports ={
 					add: function (req, res, next) {					
@@ -39,6 +40,40 @@ module.exports ={
 								});						
 						});						
 					},
+					bulkChangeStatus: function(req, res, next){		
+						var params = _.pick(req.body, 'messages', 'status');
+						if(params.messages == null || params.messages.length == 0 || params.status == null){
+							return next("Messages and Status must exist!");
+						}												
+						msgsMap = new HashMap();						
+						req.models.message.find({_id:params.messages}, function (err, msgs){
+							if(err || msgs == null || msgs.length == 0) 
+							{
+								return next("Message not found!");
+							}
+							for(var i = 0 ; i < msgs.length ; i++){
+								message = msgs[i];								
+								message.status = params.status;
+								message.updateStatus = true;
+								if(msgsMap.has(message.sender.roomId)){
+									msgsMap.get(message.sender.roomId).push(message.serialize());
+								}else{
+									temp = [];
+									temp.push(message.serialize());
+									msgsMap.set(message.sender.roomId,temp);
+								}
+								message.save(function(err){
+									if(err) 
+									{
+										return next("Error in saving message!");
+									}											
+								});						
+							}										
+							data = {};
+							data.msgsMap = msgsMap;
+							return res.send(200, data);
+						});								
+					},
 					changeStatusGot: function(req, res, next){
 						var params = _.pick(req.body, 'messageId');
 						if(params.messageId == null){
@@ -61,6 +96,31 @@ module.exports ={
 								});						
 						});												
 					},
+					bulkChangeStatusGot: function(req, res, next){
+						var params = _.pick(req.body, 'messages');
+						if(params.messages == null || params.messages.length == 0){
+							return next("Messages' Id must exist!");
+						}
+						req.models.message.find({_id: params.messages}, function (err, messages) 
+						{
+							  if(err || messages == null || messages.length == 0) 
+							  {
+									return next("Message not found!");
+							  }									  				
+							  for(var i = 0 ; i < messages.length ; i++){
+								message = messages[i];
+								message.updateStatus = false;								
+								messages[i] = message.serialize();
+								message.save(function(err){
+									if(err) 
+										{
+											return next("Error in saving message!");
+										}									
+									});						
+							  }
+							  return res.send(200, messages);
+						});												
+					},					
 					getChatList: function(req, res, next){
 						var params = _.pick(req.body, 'userId', 'messageId');
 						req.models.message.get(params.messageId, function(err, msg){
@@ -110,9 +170,12 @@ module.exports ={
 							}							
 							msgList = [];
 							for(var i = 0 ; i < msgs.length ; i++){
-								msg = msgs[i];
-								msg = msg.serialize();
-								msgList.push(msg);
+								msg = msgs[i];																
+								//msg.updateStatus = false;
+								msgList.push(msg.serialize());
+								/*msg.save(function(err){
+									return next('An error aoccured during saving message!');
+								});*/
 							}
 							data = {};
 							data.msgs = msgList;
