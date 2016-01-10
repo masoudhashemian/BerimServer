@@ -319,6 +319,11 @@ module.exports = function(io ,socket, clients){
 					body = JSON.parse(body);					
 					user = body.user;
 					delete user.password;
+					if(clients.has(user.id)){
+						user.status = "online";
+					}else{
+						user.status = "offline";
+					}
 					error = false;
 					res = new Object();
 					res.error = error;
@@ -562,6 +567,16 @@ module.exports = function(io ,socket, clients){
 	socket.on('disconnect', function() {
 		clients.remove(socket.userId);
         console.log(socket.userId+' leaved!');		
+		data = {};
+		data.userId = socket.userId;
+		request.post(
+			settings.serverAddress+'/user/update_last_seen',
+			{ form: data},
+			function (error, response, body){				
+				//user = JSON.parse(body);
+				console.log(socket.userId+'\'s last seen : '+user.lastSeen);
+			}
+		);		
     });	
 	
 	socket.on('getOnlineRoomsRequest', function(){				

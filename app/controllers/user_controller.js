@@ -130,4 +130,21 @@ module.exports ={
 							}
 						});						
 					}
+					/*updateLastSeen: function(req, res, next){
+						var params = _.pick(req.body, 'userId');						
+						req.models.user.get(params.userId, function(err, user){		
+							if(user == null)			
+							{								
+								return res.send(600, 'No user found!');															
+							}else{
+								user.lastSeen = Date.now();
+								user.save(function(error){
+									if(error){
+										return next('An error occured during saving last seen for user!');
+									}
+								});
+								return res.send(200, user.serialize());
+							}
+						});						
+					}*/
 				};
