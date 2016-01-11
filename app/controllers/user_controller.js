@@ -115,7 +115,7 @@ module.exports ={
 					},
 					searchUser: function(req, res, next){
 						var params = _.pick(req.body, 'query');
-						req.models.user.find({$or:[{phoneNumber:params.query},{nickName:params.query}]}, function(err, users){		
+						req.models.user.find({$or:[{phoneNumber:{$regex: params.query}},{nickName:{$regex: params.query}}]}, function(err, users){		
 							if(users == null)			
 							{								
 								return res.send(600, 'Error in DB!');					
