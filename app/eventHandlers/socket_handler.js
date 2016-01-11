@@ -18,9 +18,13 @@ module.exports = function(io ,socket, clients){
 			function (error, response, body) {				
 				if (!error && response.statusCode == 200) {					
 				    user = JSON.parse(body);										
-					socket.userId = user.id;
-					socket.join(user.roomId);															
-					clients.set(socket.userId, socket);	
+					//socket.userId = user.id;
+					//socket.join(user.roomId);															
+					//clients.set(socket.userId, socket);	
+					receptor = user.phoneNumber;
+					message = "Your activation code is : "+user.activationCode;
+					//res = helpers.sendSMS(receptor, message);					
+					console.log(message);
 					error = false;
 					res = new Object();
 					res.error = error;
@@ -50,37 +54,45 @@ module.exports = function(io ,socket, clients){
 			{ form: data },
 			function (error, response, body) {
 				if (!error && response.statusCode == 200) {					
-				    user = JSON.parse(body);					
-					socket.userId = user.id;					
-					clients.set(socket.userId, socket);					
-					request.post(
-						settings.serverAddress+'/user/get_rooms',
-						{ form: {userId: user.id}},
-						function (error, response, body){							
-							if(!error && response.statusCode == 200){															
-								body = JSON.parse(body);
-								rooms = body.rooms;
-								for(var i = 0 ; i < rooms.length; i++){
-									room = rooms[i];	
-									console.log(room.id);									
-									socket.join(room.id);
-								}	
+				    user = JSON.parse(body);	
+					if(user.active){
+						socket.userId = user.id;					
+						clients.set(socket.userId, socket);					
+						request.post(
+							settings.serverAddress+'/user/get_rooms',
+							{ form: {userId: user.id}},
+							function (error, response, body){							
+								if(!error && response.statusCode == 200){															
+									body = JSON.parse(body);
+									rooms = body.rooms;
+									for(var i = 0 ; i < rooms.length; i++){
+										room = rooms[i];	
+										console.log(room.id);									
+										socket.join(room.id);
+									}	
 								
-								error = false;
-								res = new Object();
-								res.error = error;
-								res.data = user;	
-								//res.data = md5(res.data);
-								socket.emit('signInResponse', res);								
-							}else{				
-								error = true;
-								res = new Object();
-								res.error = error;
-								res.errorMessage = "Password or Phone number is incorrect!";		
-								socket.emit('signInResponse', res);
+									error = false;
+									res = new Object();
+									res.error = error;
+									res.data = user;	
+									//res.data = md5(res.data);
+									socket.emit('signInResponse', res);								
+								}else{				
+									error = true;
+									res = new Object();
+									res.error = error;
+									res.errorMessage = "Password or Phone number is incorrect!";		
+									socket.emit('signInResponse', res);
+								}
 							}
-						}
-					);			
+						);
+					}else{
+						error = true;
+						res = new Object();
+						res.error = error;
+						res.errorMessage = "User account is not activated!";									
+						socket.emit('signInResponse', res);					
+					}
 				}else{					
 					error = true;
 					res = new Object();
@@ -314,8 +326,7 @@ module.exports = function(io ,socket, clients){
 			{ form: data},
 			function (error, response, body){							
 				if(!error && response.statusCode == 200){	
-					body = JSON.parse(body);					
-					user = body.user;
+					user = JSON.parse(body);					
 					delete user.password;
 					if(clients.has(user.id)){
 						user.status = "online";
@@ -372,7 +383,7 @@ module.exports = function(io ,socket, clients){
 		);		
 	});		
 	
-	ss(socket).on('setAvatarRequest', function(stream, data){		
+	ss(socket).on('setAvatarRequest', function(stream){		
 		responseEvent = 'setAvatarResponse';
 		if(!helpers.checkLogin(socket, responseEvent)){
 			return;
@@ -407,7 +418,71 @@ module.exports = function(io ,socket, clients){
 				}
 			}
 		);		
-	});			
+	});		
+
+	socket.on('resendActivationCodeRequest', function(data){
+		responseEvent = 'resendActivationCodeResponse';					
+		request.post(
+			settings.serverAddress+'/user/get_user_info',
+			{ form: data},
+			function (error, response, body){							
+				if(!error && response.statusCode == 200){	
+					user = JSON.parse(body);			
+					receptor = user.phoneNumber;
+					message = "Your activation code is : "+user.activationCode;
+					//res = helpers.sendSMS(receptor, message);
+					console.log(message);
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = {message: 'Activation Code was resent!'};
+					socket.emit(responseEvent, res);
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = "An error occurred during authorizing user!";
+					socket.emit(responseEvent, res);
+				}
+			}
+		);				
+	});
+	
+	socket.on('activeUserRequest', function(data){
+		responseEvent = 'activeUserResponse';		
+		request.post(
+			settings.serverAddress+'/user/active',
+			{ form: data},
+			function (error, response, body){							
+				if(!error && response.statusCode == 200){	
+					user = JSON.parse(body);
+					if(user.active){
+						socket.userId = user.id;
+						socket.join(user.roomId);															
+						clients.set(socket.userId, socket);		
+						error = false;
+						res = new Object();
+						res.error = error;
+						res.data = user;
+						//res.data = md5(res.data);
+						socket.emit('activeUserResponse', res);
+					}else{
+						error = true;
+						res = new Object();
+						res.error = error;
+						res.errorMessage = "Activation Code is incorrect!";	
+						socket.emit('activeUserResponse', res);
+					}
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = "An error occurred during user activation!";									
+					socket.emit('activeUserResponse', res);
+				}
+			}
+		);		
+	});		
 	
 	//events
 	ss(socket).on('sendMessageRequest', function(stream, msg){		

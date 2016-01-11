@@ -3,8 +3,7 @@ var helpers = require('./_helpers');
 var orm     = require('orm');
 
 module.exports ={
-					register: function (req, res, next) {		
-						console.log('kir khar');
+					register: function (req, res, next) {								
 						var params = _.pick(req.body, 'password', 'phoneNumber', 'nickName');
 						console.log(req.body);
 						req.models.user.create(params, function (err, user) 
@@ -99,20 +98,34 @@ module.exports ={
 						});
 					},
 					getUserInfo: function(req, res, next){
-						var params = _.pick(req.body, 'phoneNumber');
-						req.models.user.find(params, function(err, users){		
-							if(users.length==0)			
-							{								
-								return res.send(600, 'Phone number not found!');															
-							}else{
-								user = users[0];								
-								console.log('user found!');
-								console.log(user.serialize());	
-								data = {};
-								data.user = user.serialize();
-								return res.send(200, data);
-							}
-						});						
+						var params = _.pick(req.body, 'phoneNumber', 'userId');
+						if(params.phoneNumber == null && params.userId == null){
+							return next('Phone number or user ID must exist!');
+						}
+						if(params.phoneNumber){
+							req.models.user.find(params, function(err, users){		
+								if(users.length==0)			
+								{								
+									return res.send(600, 'Phone number not found!');															
+								}else{
+									user = users[0];								
+									console.log('user found!');
+									console.log(user.serialize());	
+									return res.send(200, user.serialize());
+								}
+							});
+						}else{
+							req.models.user.get(params.userId, function(err, user){		
+								if(user == null)			
+								{								
+									return res.send(600, 'User ID not found!');															
+								}else{													
+									console.log('user found!');
+									console.log(user.serialize());	
+									return res.send(200, user.serialize());
+								}
+							});							
+						}
 					},
 					searchUser: function(req, res, next){
 						var params = _.pick(req.body, 'query');
@@ -157,6 +170,28 @@ module.exports ={
 								user.save(function(err){
 									return next('An error occured during saving avatar address of user!');
 								});
+								return res.send(200, user.serialize());
+							}
+						});						
+					},
+					active: function(req, res, next){
+						var params = _.pick(req.body, 'userId', 'activationCode');
+						if(params.userId == null || params.activationCode == null){
+							return next('User ID and Activation Code must exist!');
+						}
+						req.models.user.get(params.userId, function(err, user){		
+							if(user == null)			
+							{								
+								return res.send(600, 'No user found!');															
+							}else{
+								console.log('debug in active : ');
+								console.log(params.activationCode);
+								console.log(user.activationCode);
+								if(params.activationCode == user.activationCode){
+									user.active = true;
+									console.log(user.serialize());
+									user.save();
+								}
 								return res.send(200, user.serialize());
 							}
 						});						

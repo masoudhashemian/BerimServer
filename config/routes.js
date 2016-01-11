@@ -25,4 +25,5 @@ module.exports = function (app) {
   app.get('/avatars'                ,controllers.upload.sendAvatar);
   app.post('/user/update_last_seen' ,controllers.user.updateLastSeen);  
   app.post('/user/set_avatar'       ,controllers.user.setAvatar);  
+  app.post('/user/active'           ,controllers.user.active);    
 };

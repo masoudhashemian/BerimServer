@@ -8,13 +8,17 @@ module.exports = function (orm, db)
 		nickName : {type : 'text'},
 		room     : {type : 'object'},
 		lastSeen : {type : 'date', time : true},
-		avatarAddress : {type : 'text'}
+		avatarAddress : {type : 'text'},
+		active : {type : 'boolean'},
+		activationCode : {type : 'number'}
 	},
 		
 	{   
 		 hooks: {
 					beforeCreate: function (next) {
 						obj=this;
+						obj.activationCode = Math.round(Math.random()*10000);
+						obj.active = false;
 						User.exists({phoneNumber: this.phoneNumber}, function (err, exists) 
 						{
 							if (exists)
@@ -52,7 +56,9 @@ module.exports = function (orm, db)
 					nickName     : this.nickName,					
 					roomId       : this.room._id,
 					lastSeen     : this.lastSeen,
-					avatarAddress : this.avatarAddress
+					avatarAddress : this.avatarAddress,
+					active    : this.active,
+					activationCode : this.activationCode
 				};
 			},
 			getRoomId: function(){
