@@ -114,11 +114,11 @@ module.exports ={
 						});						
 					},
 					searchUser: function(req, res, next){
-						var params = _.pick(req.body, 'phoneNumber', 'nickName');
-						req.models.user.find(params, function(err, users){		
-							if(users.length==0)			
+						var params = _.pick(req.body, 'query');
+						req.models.user.find({$or:[{phoneNumber:params.query},{nickName:params.query}]}, function(err, users){		
+							if(users == null)			
 							{								
-								return res.send(600, 'No user found!');															
+								return res.send(600, 'Error in DB!');					
 							}else{
 								for(var i = 0 ; i < users.length ; i++){
 									users[i] = users[i].serialize();
