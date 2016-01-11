@@ -3,7 +3,8 @@ var helpers = require('./_helpers');
 var orm     = require('orm');
 
 module.exports ={
-					register: function (req, res, next) {								
+					register: function (req, res, next) {		
+						console.log('kir khar');
 						var params = _.pick(req.body, 'password', 'phoneNumber', 'nickName');
 						console.log(req.body);
 						req.models.user.create(params, function (err, user) 
@@ -144,5 +145,20 @@ module.exports ={
 								return res.send(200, user.serialize());
 							}
 						});						
-					}
+					},
+					setAvatar: function(req, res, next){
+						var params = _.pick(req.body, 'userId', 'avatarAddress');
+						req.models.user.get(params.userId, function(err, user){		
+							if(user == null)			
+							{								
+								return res.send(600, 'No user found!');															
+							}else{
+								user.avatarAddress = params.avatarAddress;	
+								user.save(function(err){
+									return next('An error occured during saving avatar address of user!');
+								});
+								return res.send(200, user.serialize());
+							}
+						});						
+					}					
 				};

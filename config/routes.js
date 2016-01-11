@@ -22,5 +22,7 @@ module.exports = function (app) {
   app.post('/user/get_user_info'    ,controllers.user.getUserInfo);
   app.post('/user/search_user'      ,controllers.user.searchUser);
   app.get('/uploads'                ,controllers.upload.sendFile);
+  app.get('/avatars'                ,controllers.upload.sendAvatar);
   app.post('/user/update_last_seen' ,controllers.user.updateLastSeen);  
+  app.post('/user/set_avatar'       ,controllers.user.setAvatar);  
 };

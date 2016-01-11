@@ -372,6 +372,43 @@ module.exports = function(io ,socket, clients){
 		);		
 	});		
 	
+	ss(socket).on('setAvatarRequest', function(stream, data){		
+		responseEvent = 'setAvatarResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}			
+		data = {};
+		data.userId = socket.userId;
+		fileName = new Date().getTime() + '-' +  socket.userId + '.png';
+		console.log('streaming...');
+		stream.pipe(fs.createWriteStream(settings.path+'/uploads/avatars/'+fileName));
+		console.log('done!');
+		console.log('fileAddress : ');
+		data.avatarAddress = settings.serverAddress+'/avatars/?fileName='+fileName;
+		console.log(data.avatarAddress);		
+		request.post(
+			settings.serverAddress+'/user/set_avatar',
+			{ form: data},
+			function (error, response, body){							
+				if(!error && response.statusCode == 200){	
+					user = JSON.parse(body);										
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = user;	
+					//res.data = md5(res.data);
+					socket.emit(responseEvent, res);											
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = "An error occurred during setting avatar for user!";									
+					socket.emit(responseEvent, res);
+				}
+			}
+		);		
+	});			
+	
 	//events
 	ss(socket).on('sendMessageRequest', function(stream, msg){		
 		responseEvent = 'sendMessageResponse';
@@ -394,7 +431,7 @@ module.exports = function(io ,socket, clients){
 		if(msg.fileExt != null){
 			fileName = new Date().getTime() + '-' +  socket.userId + '.'+msg.fileExt;
 			console.log('streaming...');
-			stream.pipe(fs.createWriteStream(settings.path+'/uploads/'+fileName));
+			stream.pipe(fs.createWriteStream(settings.path+'/uploads/fileSharing/'+fileName));
 			console.log('done!');
 			console.log('fileAddress : ');
 			msg.fileAddress = settings.serverAddress+'/uploads/?fileName='+fileName;
