@@ -125,7 +125,9 @@ module.exports ={
 						var params = _.pick(req.body, 'userId', 'messageId');
 						req.models.message.get(params.messageId, function(err, msg){
 							if(msg == null){								
-								return next("Message not found!");
+								//return next("Message not found!");
+								msg = {};
+								msg.date = 0;
 							}							
 							req.models.join.find({userId: params.userId}, function(err, joins){
 								if(err){
