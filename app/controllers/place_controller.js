@@ -4,7 +4,7 @@ var orm     = require('orm');
 
 module.exports ={
 					register: function (req, res, next) {							
-						var params = _.pick(req.body, 'name');
+						var params = _.pick(req.body, 'name', 'avatarAddress');
 						req.models.place.create(params, function (err, place) 
 						{
 							  if(err) 
@@ -30,5 +30,5 @@ module.exports ={
 							data.places = places;
 							return res.send(200, data);
 						});
-					}
+					}					
 				};

@@ -4,10 +4,18 @@ module.exports = function (orm, db)
 {
 	var Place = db.define('place', {		
 		name      : { type: 'text', required: true},
-		voteNumber : { type: 'number', defaultValue: 0}
+		voteNumber : { type: 'number', defaultValue: 0},
+		avatarAddress : {type : 'text'}		
 	},
 		
-	{   			
+	{   
+		 hooks: {
+					beforeCreate: function (next) {
+						obj=this;						
+						return next();
+					}
+		}  ,
+		
 		methods: 
 		{
 			serialize: function () 
@@ -15,7 +23,8 @@ module.exports = function (orm, db)
 				return {
 				id           : this._id,
 				name     : this.name,
-				voteNumber       : this.voteNumber
+				voteNumber       : this.voteNumber,
+				avatarAddress    : this.avatarAddress
 				};
 			}
 		}

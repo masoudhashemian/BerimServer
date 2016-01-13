@@ -18,7 +18,7 @@ module.exports = function (orm, db)
 		 hooks: {
 					beforeCreate: function (next) {
 						obj=this;
-						obj.avatarAddress = settings.serverAddress+'/avatars/?fileName=default-avatar.png';
+						obj.avatarAddress = settings.serverAddress+'/avatars/?fileName=default-user-avatar.png';
 						obj.activationCode = Math.round(Math.random()*10000);
 						obj.active = false;
 						User.exists({phoneNumber: this.phoneNumber}, function (err, exists) 

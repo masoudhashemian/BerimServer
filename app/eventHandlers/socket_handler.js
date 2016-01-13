@@ -5,7 +5,6 @@ var settings = require('../../config/settings');
 var helpers = require('./_helpers');
 var fs = require('fs');
 var md5 = require('md5');
-var ss = require('socket.io-stream');
 var HashMap = require('hashmap');
 
 module.exports = function(io ,socket, clients){		
@@ -383,20 +382,12 @@ module.exports = function(io ,socket, clients){
 		);		
 	});		
 	
-	ss(socket).on('setAvatarRequest', function(stream){		
+	socket.on('setAvatarRequest', function(data){		
 		responseEvent = 'setAvatarResponse';
 		if(!helpers.checkLogin(socket, responseEvent)){
 			return;
-		}			
-		data = {};
-		data.userId = socket.userId;
-		fileName = new Date().getTime() + '-' +  socket.userId + '.png';
-		console.log('streaming...');
-		stream.pipe(fs.createWriteStream(settings.path+'/uploads/avatars/'+fileName));
-		console.log('done!');
-		console.log('fileAddress : ');
-		data.avatarAddress = settings.serverAddress+'/avatars/?fileName='+fileName;
-		console.log(data.avatarAddress);		
+		}							
+		data.userId = socket.userId;											
 		request.post(
 			settings.serverAddress+'/user/set_avatar',
 			{ form: data},
@@ -484,33 +475,43 @@ module.exports = function(io ,socket, clients){
 		);		
 	});		
 	
+	/*socket.on('leaveRoomRequest', function(data){
+		responseEvent = 'addUserToRoomResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}		
+		request.post(
+			settings.serverAddress+'/room/add_user_to_room',			
+			{form : data},
+			function (error, response, body) {
+				if (!error && response.statusCode == 200) {	
+					body = JSON.parse(body);					
+					if(clients.has(body.userId)){
+						userSocket = clients.get(body.userId);
+						userSocket.join(body.roomId);
+					}
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = body;		
+					//res.data = md5(res.data);
+					socket.emit('addUserToRoomResponse', res);
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = "An error occurred during adding user to room!";									
+					socket.emit('addUserToRoomResponse', res);
+				}
+			}
+		);
+	});	*/
+	
 	//events
-	ss(socket).on('sendMessageRequest', function(stream, msg){		
+	socket.on('sendMessageRequest', function(msg){		
 		responseEvent = 'sendMessageResponse';
 		if(!helpers.checkLogin(socket, responseEvent)){
 			return;
-		}	
-		/*try{
-			fileName = helpers.saveAttachment(msg, socket.userId);		
-			if(fileName != null && fileName != 'error'){
-				msg.fileName = fileName;
-			}
-		}catch(err){
-			error = true;
-			res = new Object();
-			res.error = error;
-			res.errorMessage = "An error occurred during saving attachments!";									
-			socket.emit('sendMessageResponse', res);					
-			return;		
-		}*/
-		if(msg.fileExt != null){
-			fileName = new Date().getTime() + '-' +  socket.userId + '.'+msg.fileExt;
-			console.log('streaming...');
-			stream.pipe(fs.createWriteStream(settings.path+'/uploads/fileSharing/'+fileName));
-			console.log('done!');
-			console.log('fileAddress : ');
-			msg.fileAddress = settings.serverAddress+'/uploads/?fileName='+fileName;
-			console.log(msg.fileAddress);
 		}
 		msg.senderId = socket.userId;
 		request.post(
@@ -519,10 +520,6 @@ module.exports = function(io ,socket, clients){
 			function (error, response, body){							
 				if(!error && response.statusCode == 200){	
 					msg = JSON.parse(body);		
-					/*file = helpers.loadAttachment(msg);
-					if(file != null){
-						msg.file = file;
-					}*/
 					error = false;
 					res = new Object();
 					res.error = error;

@@ -3,8 +3,7 @@ var controllers = require('../app/controllers')
 
 module.exports = function (app) {
   app.get( '/'                           , controllers.home.home);
-  app.post( '/user/sign_up'                   , controllers.user.register);    
-  app.get( '/chat'                        ,controllers.home.chat);
+  app.post( '/user/sign_up'                   , controllers.user.register);
   app.post( '/user/sign_in'                       ,controllers.user.signIn);  
   app.post('/room/add_room'                 ,controllers.room.register);
   app.post('/user/get_rooms'                ,controllers.user.getRooms);
@@ -25,5 +24,6 @@ module.exports = function (app) {
   app.get('/avatars'                ,controllers.upload.sendAvatar);
   app.post('/user/update_last_seen' ,controllers.user.updateLastSeen);  
   app.post('/user/set_avatar'       ,controllers.user.setAvatar);  
-  app.post('/user/active'           ,controllers.user.active);    
+  app.post('/user/active'           ,controllers.user.active);      
+  app.post('/uploads'               ,controllers.upload.saveFile);
 };

@@ -137,8 +137,9 @@ module.exports ={
 								for(var i = 0 ; i < joins.length ; i++){
 									join = joins[i];
 									join = join.serialize();
-									orStatement.push({roomId : join.roomId});
+									orStatement.push({roomId : join.roomId});									
 								}				
+								orStatement.push({senderId : params.userId});
 								console.log(orStatement);
 								console.log(msg.date);
 								//$or : [{senderId : user._id}, {roomId : user.getRoomId()}]

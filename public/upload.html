@@ -1,0 +1,52 @@
+<!doctype html >
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Berim</title>
+    <link rel="stylesheet" type="text/css" href="./style/signUp.css">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>    
+  </head>
+  <body>
+        <div class="container"> 
+            <div class="">
+                <ul class="">
+					<div class="registerationForm">
+                    <form id="eventTesterForm" method="post" action="/uploads" enctype="multipart/form-data">
+
+                        <fieldset>
+                            <p id="title">Event Tester</p>
+                            <li><label id="" style="color: red; font-weight:bold; text-align:center;">
+                                </label></li>
+
+
+                            <li><label class="">Fire Event</label><input name='freEvent' id="fireEvent" type="text" placeholder="Fire Event Name" value=""/></li>
+                            <br/>
+                            <li><label class="">Listen Event</label><input name='listenEvent' id="listenEvent" type="text" placeholder="Listen Event Name" value=""/></li>
+                            <br/>	
+                            <li><label class="">Upload File</label><input name='file' id="uploadFile" type="file"/></li>
+                            <br/>							
+                            <li><label class="">Fire Message</label><br/>
+							<textarea name="fireMessage" id="fireMessage" form="eventTesterForm" style="margin: 0px; width: 330px; height: 200px;"></textarea>							
+                            <li><label class="">Trigger</label><br/>
+							<textarea name="trigger" id="trigger" form="eventTesterForm" style="margin: 0px; width: 330px; height: 200px;"></textarea>							
+                            <br/>                                                      
+                            <br/><br/><br/>
+                            <li><input id="submit" type="submit" value="Fire" /></li>
+                        </fieldset>
+                    </form>
+					</div>
+            </div>
+            </ul>
+
+        </div>	
+
+
+        <div id="footer">
+            <p >
+                Evetn Tester
+                <br>
+                    Where you can test your event-based app.
+            </p>
+        </div>
+    </body>	  
+  </html>
