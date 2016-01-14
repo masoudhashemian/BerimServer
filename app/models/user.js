@@ -3,24 +3,19 @@ var settings = require('../../config/settings');
 
 module.exports = function (orm, db) 
 {
-	var User = db.define('user', {
-		password      : { type: 'text', required: true},
+	var User = db.define('user', {		
 		phoneNumber : { type: 'number', required: true, unique:true},
 		nickName : {type : 'text'},
 		room     : {type : 'object'},
 		lastSeen : {type : 'date', time : true},
-		avatarAddress : {type : 'text'},
-		active : {type : 'boolean'},
-		activationCode : {type : 'number'}
+		avatarAddress : {type : 'text'}		
 	},
 		
 	{   
 		 hooks: {
 					beforeCreate: function (next) {
 						obj=this;
-						obj.avatarAddress = settings.serverAddress+'/avatars/?fileName=default-user-avatar.png';
-						obj.activationCode = Math.round(Math.random()*10000);
-						obj.active = false;
+						obj.avatarAddress = settings.serverAddress+'/avatars/?fileName=default-user-avatar.png';						
 						User.exists({phoneNumber: this.phoneNumber}, function (err, exists) 
 						{
 							if (exists)
@@ -52,15 +47,12 @@ module.exports = function (orm, db)
 			serialize: function () 
 			{
 				return {
-					id           : this._id,
-					password     : this.password,
+					id           : this._id,					
 					phoneNumber  : this.phoneNumber,
 					nickName     : this.nickName,					
 					roomId       : this.room._id,
 					lastSeen     : this.lastSeen,
-					avatarAddress : this.avatarAddress,
-					active    : this.active,
-					activationCode : this.activationCode
+					avatarAddress : this.avatarAddress					
 				};
 			},
 			getRoomId: function(){

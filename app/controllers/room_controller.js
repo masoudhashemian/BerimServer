@@ -37,5 +37,18 @@ module.exports ={
 								return res.send(600, "An error occurred during joining user to room!");
 							}
 						});
+					},
+					removeUser: function(req, res, next){
+						var params = _.pick(req.body, 'userId', 'roomId');
+						req.models.join.find(params, function(err, joins){
+							if(err || joins.length == 0)
+							{
+								return next('DB internal error!');
+							}
+							join = joins[0];
+							data = join;
+							join.remove(function(err){});												
+							return res.send(200, data.serialize());
+						});
 					}					
 				};

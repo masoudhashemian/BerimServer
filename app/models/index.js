@@ -9,6 +9,7 @@ function setup(db, cb) {
   require('./join')(orm, db);  
   require('./message')(orm, db);  
   require('./place')(orm, db);
+  require('./userLogIn')(orm, db);
   
   return cb(null, db);
 }

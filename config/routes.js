@@ -26,4 +26,9 @@ module.exports = function (app) {
   app.post('/user/set_avatar'       ,controllers.user.setAvatar);  
   app.post('/user/active'           ,controllers.user.active);      
   app.post('/uploads'               ,controllers.upload.saveFile);
+  app.post('/room/remove_user_from_room' ,controllers.room.removeUser);
+  app.post('/user/edit_profile'     ,controllers.user.editProfile);  
+  app.post('/user/log_in'      ,controllers.user.logIn);  
+  app.post('/user/log_out'     ,controllers.user.logOut);  
+  app.post('/user/resend_activation_code'     ,controllers.user.resendActivationCode);  
 };

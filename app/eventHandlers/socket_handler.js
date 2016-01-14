@@ -414,19 +414,16 @@ module.exports = function(io ,socket, clients){
 	socket.on('resendActivationCodeRequest', function(data){
 		responseEvent = 'resendActivationCodeResponse';					
 		request.post(
-			settings.serverAddress+'/user/get_user_info',
+			settings.serverAddress+'/user/resend_activation_code',
 			{ form: data},
 			function (error, response, body){							
 				if(!error && response.statusCode == 200){	
-					user = JSON.parse(body);			
-					receptor = user.phoneNumber;
-					message = "Your activation code is : "+user.activationCode;
-					//res = helpers.sendSMS(receptor, message);
-					console.log(message);
+					user = JSON.parse(body);					
 					error = false;
 					res = new Object();
 					res.error = error;
-					res.data = {message: 'Activation Code was resent!'};
+					//res.data = {message: 'Activation Code was resent!'};
+					res.data = {activationCode: user.activationCode};
 					socket.emit(responseEvent, res);
 				}else{				
 					error = true;
@@ -475,37 +472,174 @@ module.exports = function(io ,socket, clients){
 		);		
 	});		
 	
-	/*socket.on('leaveRoomRequest', function(data){
-		responseEvent = 'addUserToRoomResponse';
+	socket.on('leaveRoomRequest', function(data){
+		responseEvent = 'leaveRoomResponse';
 		if(!helpers.checkLogin(socket, responseEvent)){
 			return;
 		}		
+		data.userId = socket.userId;
 		request.post(
-			settings.serverAddress+'/room/add_user_to_room',			
+			settings.serverAddress+'/room/remove_user_from_room',			
 			{form : data},
 			function (error, response, body) {
 				if (!error && response.statusCode == 200) {	
 					body = JSON.parse(body);					
-					if(clients.has(body.userId)){
-						userSocket = clients.get(body.userId);
-						userSocket.join(body.roomId);
-					}
+					socket.leave(body.roomId);
 					error = false;
 					res = new Object();
 					res.error = error;
 					res.data = body;		
 					//res.data = md5(res.data);
-					socket.emit('addUserToRoomResponse', res);
+					socket.emit(responseEvent, res);
 				}else{				
 					error = true;
 					res = new Object();
 					res.error = error;
-					res.errorMessage = "An error occurred during adding user to room!";									
-					socket.emit('addUserToRoomResponse', res);
+					res.errorMessage = "An error occurred during removing user from room!";									
+					socket.emit(responseEvent, res);
 				}
 			}
 		);
-	});	*/
+	});	
+	
+	socket.on('editProfileRequest', function(data){		
+		responseEvent = 'editProfileResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}							
+		data.userId = socket.userId;											
+		request.post(
+			settings.serverAddress+'/user/edit_profile',
+			{ form: data},
+			function (error, response, body){							
+				if(!error && response.statusCode == 200){	
+					user = JSON.parse(body);										
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = user;	
+					//res.data = md5(res.data);
+					socket.emit(responseEvent, res);											
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = "An error occurred during editing user's profile!";									
+					socket.emit(responseEvent, res);
+				}
+			}
+		);		
+	});		
+	
+	socket.on('logInRequest', function(data){
+		responseEvent = 'logInResponse';
+		request.post(
+			settings.serverAddress+'/user/log_in',
+			{ form: data },
+			function (error, response, body) {
+				if (!error && response.statusCode == 200) {					
+				    user = JSON.parse(body);	
+					if(user.active){
+						socket.userId = user.id;					
+						clients.set(socket.userId, socket);					
+						request.post(
+							settings.serverAddress+'/user/get_rooms',
+							{ form: {userId: user.id}},
+							function (error, response, body){							
+								if(!error && response.statusCode == 200){															
+									body = JSON.parse(body);
+									rooms = body.rooms;
+									for(var i = 0 ; i < rooms.length; i++){
+										room = rooms[i];	
+										console.log(room.id);									
+										socket.join(room.id);
+									}	
+								
+									error = false;
+									res = new Object();
+									res.error = error;
+									res.data = user;	
+									//res.data = md5(res.data);
+									socket.emit(responseEvent, res);								
+								}else{				
+									error = true;
+									res = new Object();
+									res.error = error;
+									res.errorMessage = "An error occurred during log-in!";		
+									socket.emit(responseEvent, res);
+								}
+							}
+						);
+					}else{
+						error = false;
+						res = new Object();
+						res.error = error;
+						res.data = {activationCode: user.activationCode};
+						socket.emit(responseEvent, res);					
+					}
+				}else{					
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = "An error occurred during log-in!";									
+					socket.emit(responseEvent, res);
+				}
+			}
+		);	
+	});	
+	
+	socket.on('logOutRequest', function(data){		
+		responseEvent = 'logOutResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}							
+		data.userId = socket.userId;											
+		request.post(
+			settings.serverAddress+'/user/log_out',
+			{ form: data},
+			function (error, response, body){							
+				if(!error && response.statusCode == 200){	
+					user = JSON.parse(body);	
+					request.post(
+						settings.serverAddress+'/user/get_rooms',
+						{ form: {userId: user.id}},
+						function (error, response, body){							
+							if(!error && response.statusCode == 200){															
+								body = JSON.parse(body);
+								rooms = body.rooms;
+								for(var i = 0 ; i < rooms.length; i++){
+									room = rooms[i];	
+									console.log(room.id);									
+									socket.leave(room.id);
+								}	
+								socket.userId = null;
+								clients.remove(user.id);								
+								
+								error = false;
+								res = new Object();
+								res.error = error;
+								res.data = user;	
+								//res.data = md5(res.data);
+								socket.emit(responseEvent, res);								
+							}else{				
+								error = true;
+								res = new Object();
+								res.error = error;
+								res.errorMessage = "An error occurred during log-out!";		
+								socket.emit(responseEvent, res);
+							}
+						}
+					);					
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = "An error occurred during log-out!";									
+					socket.emit(responseEvent, res);
+				}
+			}
+		);		
+	});			
 	
 	//events
 	socket.on('sendMessageRequest', function(msg){		

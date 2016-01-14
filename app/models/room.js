@@ -3,7 +3,7 @@ var moment = require('moment');
 module.exports = function (orm, db) 
 {
 	var Room = db.define('room', {		
-		name      : { type: 'text', required: true},
+		name      : { type: 'text'},
 		placeId : { type: 'number'},
 		maxUserCount : {type : 'number', defaultValue : 1},
 		createDate : {type : 'date', time : true}		
