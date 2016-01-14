@@ -147,7 +147,7 @@ module.exports = function(io ,socket, clients){
 			return;
 		}
 		request.post(
-			settings.serverAddress+'/place/add_place',
+			settings.serverAddress+'/place/add',
 			{ form: data },
 			function (error, response, body) {
 				if (!error && response.statusCode == 200) {
@@ -635,6 +635,93 @@ module.exports = function(io ,socket, clients){
 					res = new Object();
 					res.error = error;
 					res.errorMessage = "An error occurred during log-out!";									
+					socket.emit(responseEvent, res);
+				}
+			}
+		);		
+	});		
+
+	socket.on('addReviewRequest', function(data){
+		responseEvent = 'addReviewResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}
+		data.userId = socket.userId;		
+		request.post(
+			settings.serverAddress+'/review/add',
+			{ form: data },
+			function (error, response, body) {
+				if (!error && response.statusCode == 200) {
+					body = JSON.parse(body);
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = body;		
+					//res.data = md5(res.data);
+					socket.emit(responseEvent, res);
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = "An error occurred during adding review!";									
+					socket.emit(responseEvent, res);
+				}
+			}
+		);		
+	});	
+	
+	socket.on('updateReviewRequest', function(data){
+		responseEvent = 'updateReviewResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}
+		data.userId = socket.userId;
+		request.post(
+			settings.serverAddress+'/review/update',
+			{ form: data },
+			function (error, response, body) {
+				if (!error && response.statusCode == 200) {
+					body = JSON.parse(body);
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = body;		
+					//res.data = md5(res.data);
+					socket.emit(responseEvent, res);
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = "An error occurred during updating review!";									
+					socket.emit(responseEvent, res);
+				}
+			}
+		);		
+	});		
+	
+	socket.on('searchPlaceRequest', function(data){
+		responseEvent = 'searchPlaceResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}		
+		request.post(
+			settings.serverAddress+'/place/search',
+			{ form: data},
+			function (error, response, body){							
+				if(!error && response.statusCode == 200){	
+					body = JSON.parse(body);					
+					places = body.places;
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = places;	
+					//res.data = md5(res.data);
+					socket.emit(responseEvent, res);											
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = "An error occurred during searching place!";									
 					socket.emit(responseEvent, res);
 				}
 			}

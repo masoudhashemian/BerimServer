@@ -10,6 +10,7 @@ function setup(db, cb) {
   require('./message')(orm, db);  
   require('./place')(orm, db);
   require('./userLogIn')(orm, db);
+  require('./review')(orm, db);
   
   return cb(null, db);
 }

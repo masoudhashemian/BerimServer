@@ -8,15 +8,15 @@ module.exports = {
 	console.log(socket.userId);
     if(socket.userId == null){
 		// for development ease
-		
+		/*
 		error = true;
 		res = new Object();
 		res.error = error;
 		res.errorMessage = "Access is denied! You must log in.";		
 		socket.emit(responseEvent, res);		
 		return false;		
-		
-		//return true;
+		*/
+		return true;
 	}
 	return true;
   },

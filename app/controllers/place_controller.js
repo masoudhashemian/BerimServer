@@ -4,12 +4,13 @@ var orm     = require('orm');
 
 module.exports ={
 					register: function (req, res, next) {							
-						var params = _.pick(req.body, 'name', 'avatarAddress');
+						var params = _.pick(req.body, 'name', 'address', 'latitude', 'longtitude', 'avatar', 'category');
+						console.log(params);
 						req.models.place.create(params, function (err, place) 
 						{
 							  if(err) 
 							  {
-								helpers.reportErrors(res, next, err);
+								return next("DB internal error!");
 							  }
 							  console.log('place created!');
 							  console.log(place.serialize());
@@ -20,7 +21,7 @@ module.exports ={
 						req.models.place.find({}, function(err, places){
 							if(err)
 							{
-								helpers.reportErrors(res, next, err);
+								return next("DB internal error!");
 							}
 							for(var i = 0 ; i < places.length ; i++){
 								places[i] = places[i].serialize();
@@ -30,5 +31,54 @@ module.exports ={
 							data.places = places;
 							return res.send(200, data);
 						});
-					}					
+					},
+					search: function(req, res, next){
+						var params = _.pick(req.body, 'name', 'category', 'latitude', 'longtitude', 'radius');
+						if(params.name != null || params.category != null){
+							orStatement = [];
+							if(params.name != null){
+								orStatement.push({name: {$regex : params.name}});
+							}
+							if(params.category != null){
+								orStatement.push({category: {$regex: params.category}});
+							}
+							req.models.place.find({$or : orStatement},function(err, places){
+								if(err){
+									return next("DB internal error!");
+								}
+								for(var i = 0 ; i < places.length ; i++){
+									place = places[i];
+									places[i] = place.serialize();
+								}
+								data = {};
+								data.places = places;
+								return res.send(200, data);
+							});
+						}
+						else if(params.latitude !=  null && params.longtitude != null && params.radius != null){
+							req.models.place.find({},function(err, places){
+								if(err){
+									return next("DB internal error!");
+								}
+								selectedPlaces = [];
+								for(var i = 0 ; i < places.length ; i++){
+									place = places[i];
+									if(place.latitude == null || place.longtitude == null){
+										continue;
+									}
+									dist = helpers.getDistanceFromLatLonInKm(Number(params.latitude), Number(params.longtitude), Number(place.latitude), Number(place.longtitude));									
+									console.log(place.name+' dist : '+dist);
+									if(dist <= params.radius){
+										selectedPlaces.push(place.serialize());
+									}
+								}
+								data = {};
+								data.places = selectedPlaces;
+								return res.send(200, data);
+							});							
+						}
+						else{
+							return next("No enough input!");
+						}
+					}
 				};

@@ -5,7 +5,7 @@ var HashMap = require('hashmap');
 
 module.exports ={
 					add: function (req, res, next) {					
-						var params = _.pick(req.body, 'senderId', 'roomId', 'text', 'fileAddress');
+						var params = _.pick(req.body, 'senderId', 'roomId', 'text', 'file');
 						req.models.message.create(params, function (err, message) 
 						{
 							  if(err || message == null) 

@@ -3,14 +3,14 @@ var moment = require('moment');
 module.exports = function (orm, db) 
 {
 	var Message = db.define('message', {		
-		senderId      : { type: 'number', required: true},
-		sender      : { type: 'number'},
-		roomId : { type: 'number', required: true},
-		text : {type: 'text', required: true},
-		status : {type: 'text', defaultValue: 'deliverAtServer'},				
-		date : {type : 'date', time : true},
+		senderId     : { type: 'number', required: true},
+		sender       : { type: 'number'},
+		roomId       : { type: 'number', required: true},
+		text         : {type: 'text', required: true},
+		status       : {type: 'text', defaultValue: 'deliverAtServer'},				
+		date         : {type : 'date', time : true},
 		updateStatus : {type : 'boolean'},
-		fileAddress     : {type : 'text'}
+		file         : {type : 'text'}
 	},
 		
 	{   
@@ -38,7 +38,7 @@ module.exports = function (orm, db)
 				status       : this.status,
 				date         : this.date,
 				updateStatus : this.updateStatus,
-				fileAddress     : this.fileAddress
+				file         : this.file
 				};
 			}
 		}
