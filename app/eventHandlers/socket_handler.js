@@ -867,9 +867,9 @@ module.exports = function(io ,socket, clients, numOfConnection){
 	
 	socket.on('bulkChangeMessageStatusGotRequest', function(data){
 		responseEvent = 'bulkChangeMessageStatusGotResponse';
-		/*if(!helpers.checkLogin(socket, responseEvent)){
+		if(!helpers.checkLogin(socket, responseEvent)){
 			return;
-		}*/		
+		}
 		request.post(
 			settings.serverAddress+'/chat/bulk_change_message_status_got',
 			{ form: data},
@@ -892,6 +892,40 @@ module.exports = function(io ,socket, clients, numOfConnection){
 			}
 		);		
 	});		
+	
+	socket.on('typingRequest', function(data){
+		responseEvent = 'typingResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}
+		data.userId = socket.userId;
+		request.post(
+			settings.serverAddress+'/user/get_user_info',
+			{ form: data},
+			function (error, response, body){							
+				if(!error && response.statusCode == 200){	
+					user = JSON.parse(body);					
+					typing = {};
+					typing.action = data.action;
+					typing.user = user;
+					socket.in(data.roomId).emit('typing', typing);
+					
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = {message: 'Ok!'};								
+					//res.data = md5(res.data);
+					socket.emit(responseEvent, res);						
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = "An error occurred at server!";									
+					socket.emit(responseEvent, res);
+				}
+			}
+		);				
+	});			
 	
 	socket.on('disconnect', function() {
 		if(socket.userId != null){
