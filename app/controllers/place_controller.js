@@ -1,10 +1,11 @@
 var _       = require('lodash');
 var helpers = require('./_helpers');
 var orm     = require('orm');
+var HashMap = require('hashmap');
 
 module.exports ={
 					register: function (req, res, next) {							
-						var params = _.pick(req.body, 'name', 'address', 'latitude', 'longtitude', 'avatar', 'category');
+						var params = _.pick(req.body, 'name', 'address', 'latitude', 'longitude', 'avatar', 'category', 'description');
 						console.log(params);
 						req.models.place.create(params, function (err, place) 
 						{
@@ -19,21 +20,20 @@ module.exports ={
 					},
 					getList: function(req, res, next){
 						req.models.place.find({}, function(err, places){
-							if(err)
-							{
-								return next("DB internal error!");
-							}
+							if(err){
+								return next('DB internal error!');
+							}								
 							for(var i = 0 ; i < places.length ; i++){
-								places[i] = places[i].serialize();
+								places[i] = places[i].serialize();									
 							}
 							console.log('found '+places.length+' places!');							
 							data = {};
 							data.places = places;
-							return res.send(200, data);
+							return res.send(200, data);											
 						});
 					},
 					search: function(req, res, next){
-						var params = _.pick(req.body, 'name', 'category', 'latitude', 'longtitude', 'radius');
+						var params = _.pick(req.body, 'name', 'category', 'latitude', 'longitude', 'radius');
 						if(params.name != null || params.category != null){
 							orStatement = [];
 							if(params.name != null){
@@ -55,7 +55,7 @@ module.exports ={
 								return res.send(200, data);
 							});
 						}
-						else if(params.latitude !=  null && params.longtitude != null && params.radius != null){
+						else if(params.latitude !=  null && params.longitude != null && params.radius != null){
 							req.models.place.find({},function(err, places){
 								if(err){
 									return next("DB internal error!");
@@ -63,10 +63,10 @@ module.exports ={
 								selectedPlaces = [];
 								for(var i = 0 ; i < places.length ; i++){
 									place = places[i];
-									if(place.latitude == null || place.longtitude == null){
+									if(place.latitude == null || place.longitude == null){
 										continue;
 									}
-									dist = helpers.getDistanceFromLatLonInKm(Number(params.latitude), Number(params.longtitude), Number(place.latitude), Number(place.longtitude));									
+									dist = helpers.getDistanceFromLatLonInKm(Number(params.latitude), Number(params.longitude), Number(place.latitude), Number(place.longitude));									
 									console.log(place.name+' dist : '+dist);
 									if(dist <= params.radius){
 										selectedPlaces.push(place.serialize());

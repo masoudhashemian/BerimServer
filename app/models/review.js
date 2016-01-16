@@ -37,6 +37,12 @@ module.exports = function (orm, db)
 						obj = this;						
 						obj.date = Date.now();												
 						db.models.place.get(obj.placeId, function(err, place){
+							if(err){
+								return next('DB internal error!');
+							}
+							if(place == null){
+								return next('No place found!');
+							}
 							db.models.review.find({placeId : obj.placeId}, function(err ,reviews){
 								if(err){
 									return next("Internal DB error!");
@@ -53,6 +59,7 @@ module.exports = function (orm, db)
 									review = reviews[i];
 									if(review._id == obj._id){
 										update = true;
+										reviews[i] = obj;
 										continue;
 									}
 									if(review.rate == -1){
@@ -68,6 +75,12 @@ module.exports = function (orm, db)
 									avg = sum /(length+1);
 								}							
 								place.rate = avg;
+								if(!update){
+									reviews.push(obj);
+								}
+								temp = {};
+								temp.reviews = reviews;
+								place.reviews = temp;
 								place.save();
 								//obj.place = place;
 								return next();

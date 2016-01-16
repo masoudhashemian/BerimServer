@@ -7,10 +7,10 @@ var fs = require('fs');
 var md5 = require('md5');
 var HashMap = require('hashmap');
 
-module.exports = function(io ,socket, clients){		
+module.exports = function(io ,socket, clients, numOfConnection){		
 	
 	//requests
-	socket.on('signUpRequest', function(data){			
+	/*socket.on('signUpRequest', function(data){			
 		request.post(
 			settings.serverAddress+'/user/sign_up',
 			{ form: data },
@@ -101,7 +101,7 @@ module.exports = function(io ,socket, clients){
 				}
 			}
 		);	
-	});
+	});*/
 	
 	socket.on('getChatListRequest', function(data){		
 		responseEvent = 'getChatListResponse';
@@ -184,6 +184,7 @@ module.exports = function(io ,socket, clients){
 					res.error = error;
 					res.data = places;		
 					//res.data = md5(res.data);
+					console.log(res);
 					socket.emit('getPlacesResponse', res);
 				}else{				
 					error = true;
@@ -907,7 +908,14 @@ module.exports = function(io ,socket, clients){
 				}
 			);			
 		}
+		numOfConnection.remove(socket.id);
     });	
+	
+	socket.on('getNumOfConRequest', function(){
+		res = {};
+		res.numOfConnection = numOfConnection.keys().length;
+		socket.emit('getNumOfConResponse', res);
+	})
 	
 	socket.on('getOnlineRoomsRequest', function(){				
 	    users = [];				
