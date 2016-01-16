@@ -1,18 +1,17 @@
 var moment = require('moment');
-
 module.exports = function (orm, db) 
 {
 	var Room = db.define('room', {		
 		name      : { type: 'text'},
 		placeId : { type: 'number'},
 		maxUserCount : {type : 'number', defaultValue : 1},
-		createDate : {type : 'date', time : true}		
+		createDate : {type : 'date', time : true}
 	},
 		
 	{   
 		 hooks: {
 					beforeCreate: function (next) {						
-						this.createDate = Date.now();
+						this.createDate = Date.now();						
 						return next();
 					}
 		}  ,	
@@ -26,7 +25,7 @@ module.exports = function (orm, db)
 				name     : this.name,
 				placeId  : this.placeId,
 				maxUserCount : this.maxUserCount,
-				createDate : this.createDate		
+				createDate : this.createDate				
 				};
 			}
 		}

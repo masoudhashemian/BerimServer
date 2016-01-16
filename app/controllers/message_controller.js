@@ -14,6 +14,20 @@ module.exports ={
 							  }								 							  
 							  console.log('message added!');
 							  console.log(message.serialize());
+							  req.models.join.find({roomId: message.roomId}, function(err, joins){
+								if(err){
+									return next("DB error!");									
+								}
+								if(joins.length > 0){
+									for(var i = 0 ; i < joins.length ; i++){
+										join = joins[i];
+										if(join.userId != message.senderId){
+											join.lastMessage = message.serialize();										
+											join.save();
+										}
+									}
+								}
+							  });
 							  return res.send(200, message.serialize());  	  
 						});
 					},

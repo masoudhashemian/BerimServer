@@ -262,13 +262,13 @@ module.exports = function(io ,socket, clients, numOfConnection){
 		if(!helpers.checkLogin(socket, responseEvent)){
 			return;
 		}		
-		data.userId = socket.userId;
+		data.userId = socket.userId;		
 		request.post(
 			settings.serverAddress+'/user/get_rooms',			
 			{form : data},						
 			function (error, response, body) {
 				if (!error && response.statusCode == 200) {
-					rooms = JSON.parse(body).rooms;
+					rooms = JSON.parse(body).rooms;					
 					error = false;
 					res = new Object();
 					res.error = error;
@@ -904,7 +904,7 @@ module.exports = function(io ,socket, clients, numOfConnection){
 			{ form: data},
 			function (error, response, body){							
 				if(!error && response.statusCode == 200){	
-					user = JSON.parse(body);					
+					user = JSON.parse(body);						
 					typing = {};
 					typing.action = data.action;
 					typing.user = user;

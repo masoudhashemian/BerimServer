@@ -85,13 +85,21 @@ module.exports ={
 						});
 					},
 					getRooms: function(req, res, next){
-						var params = _.pick(req.body, 'userId');
-						req.models.join.find(params, function(err, joins){														
+						var params = _.pick(req.body, 'userId');						
+						req.models.join.find({userId: params.userId}, function(err, joins){
+							if(err){
+								return next("DB error!");
+							}							
 							var rooms = new Array();
+							if(joins.length == 0){
+								wait = false;
+							}							
 							for(var i = 0; i < joins.length; i++){
-								join = joins[i];										
-								rooms.push(join.room);
-							}			
+								join = joins[i];
+								room = join.room;
+								room.lastMessage = join.lastMessage;
+								rooms.push(room);
+							}														
 							data = {};
 							data.rooms = rooms;
 							return res.send(200, data);

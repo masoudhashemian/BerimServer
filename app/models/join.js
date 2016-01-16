@@ -7,12 +7,13 @@ module.exports = function (orm, db)
 		user        : { type : 'object'},
 		roomId      : { type : 'number', required: true},
 		room        : { type : 'object'},
-		date        : { type : 'date', time : true}		
+		date        : { type : 'date', time : true},
+		lastMessage : { type : 'object'}
 	},
 		
 	{   
 		 hooks: {
-					beforeValidation: function (next) {						
+					beforeCreate: function (next) {						
 						obj = this;
 						obj.date = Date.now();
 						db.models.join.find({roomId : obj.roomId, userId: obj.userId}, function(err, repeatedJoins){
@@ -52,7 +53,8 @@ module.exports = function (orm, db)
 				roomId       : this.roomId,	
 				user         : this.user,
 				room         : this.room,
-				date         : this.date
+				date         : this.date,
+				lastMessage  : this.lastMessage
 				};
 			}
 		}
