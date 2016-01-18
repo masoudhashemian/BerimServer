@@ -164,9 +164,7 @@ module.exports ={
 									msgList = [];
 									for(var i = 0 ; i < msgs.length ; i++){
 										msg = msgs[i];
-										msg = msg.serialize();
-										delete msg.sender.phoneNumber;
-										delete msg.sender.password;
+										msg = msg.serialize();																			
 										msgList.push(msg);
 									}
 									data = {};

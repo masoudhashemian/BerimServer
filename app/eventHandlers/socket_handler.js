@@ -202,6 +202,7 @@ module.exports = function(io ,socket, clients, numOfConnection){
 		if(!helpers.checkLogin(socket, responseEvent)){
 			return;
 		}	
+		data.userId = socket.userId;
 		request.post(
 			settings.serverAddress+'/room/add_room',			
 			{form : data},
@@ -230,6 +231,7 @@ module.exports = function(io ,socket, clients, numOfConnection){
 		if(!helpers.checkLogin(socket, responseEvent)){
 			return;
 		}		
+		data.actorId = socket.userId;
 		request.post(
 			settings.serverAddress+'/room/add_user_to_room',			
 			{form : data},

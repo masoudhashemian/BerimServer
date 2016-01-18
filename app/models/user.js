@@ -8,13 +8,15 @@ module.exports = function (orm, db)
 		nickName : {type : 'text'},
 		room     : {type : 'object'},
 		lastSeen : {type : 'date', time : true},
-		avatar   : {type : 'text'}		
+		avatar   : {type : 'text'},
+		vip      : {type : 'boolean'}
 	},
 		
 	{   
 		 hooks: {
 					beforeCreate: function (next) {
 						obj=this;
+						obj.vip = false;
 						obj.avatar = settings.serverAddress+'/avatars/?fileName=default-user-avatar.png';						
 						User.exists({phoneNumber: this.phoneNumber}, function (err, exists) 
 						{
@@ -52,7 +54,8 @@ module.exports = function (orm, db)
 					nickName     : this.nickName,					
 					roomId       : this.room._id,
 					lastSeen     : this.lastSeen,
-					avatar       : this.avatar	
+					avatar       : this.avatar,
+					vip          : this.vip
 				};
 			},
 			getRoomId: function(){
