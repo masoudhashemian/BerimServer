@@ -33,5 +33,7 @@ module.exports = function (app) {
   app.post('/user/resend_activation_code'     ,controllers.user.resendActivationCode);  
   app.post('/review/add'            ,controllers.review.add);
   app.post('/review/update'         ,controllers.review.update);
-  app.post('/place/search'          ,controllers.place.search)
+  app.post('/place/search'          ,controllers.place.search);
+  app.post('/room/get_berim'        ,controllers.room.getBerim);
+  app.post('/room/get_member'       ,controllers.room.getMember);
 };

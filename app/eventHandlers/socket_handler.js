@@ -328,8 +328,7 @@ module.exports = function(io ,socket, clients, numOfConnection){
 			{ form: data},
 			function (error, response, body){							
 				if(!error && response.statusCode == 200){	
-					user = JSON.parse(body);					
-					delete user.password;
+					user = JSON.parse(body);										
 					if(clients.has(user.id)){
 						user.status = "online";
 					}else{
@@ -731,6 +730,70 @@ module.exports = function(io ,socket, clients, numOfConnection){
 		);		
 	});			
 	
+	socket.on('getBerimsRequest', function(data){
+		responseEvent = 'getBerimsResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}						
+		request.post(
+			settings.serverAddress+'/room/get_berim',			
+			{form : data},						
+			function (error, response, body) {
+				if (!error && response.statusCode == 200) {
+					rooms = JSON.parse(body).rooms;					
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = rooms;	
+					//res.data = md5(res.data);
+					socket.emit(responseEvent, res);
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = "An error occurred during getting berims!";									
+					socket.emit(responseEvent, res);
+				}
+			}
+		);		
+	});	
+	
+	socket.on('getMembersRequest', function(data){
+		responseEvent = 'getMembersResponse';
+		if(!helpers.checkLogin(socket, responseEvent)){
+			return;
+		}						
+		request.post(
+			settings.serverAddress+'/room/get_member',			
+			{form : data},						
+			function (error, response, body) {
+				if (!error && response.statusCode == 200) {
+					users = JSON.parse(body).users;					
+					for(var i = 0 ; i < users.length ; i++){
+						user = users[i];						
+						if(clients.has(user.id)){
+							user.status = "online";
+						}else{
+							user.status = "offline";
+						}						
+					}
+					error = false;
+					res = new Object();
+					res.error = error;
+					res.data = users;	
+					//res.data = md5(res.data);
+					socket.emit(responseEvent, res);
+				}else{				
+					error = true;
+					res = new Object();
+					res.error = error;
+					res.errorMessage = "An error occurred during getting berims!";									
+					socket.emit(responseEvent, res);
+				}
+			}
+		);		
+	});		
+	
 	//events
 	socket.on('sendMessageRequest', function(msg){		
 		responseEvent = 'sendMessageResponse';
@@ -760,6 +823,7 @@ module.exports = function(io ,socket, clients, numOfConnection){
 					//console.log('after encryption : ');
 					//console.log(msg);
 					socket.in(receiver).emit('newMessage', msg);
+					socket.in(msg.sender.roomId).emit('newMessage', msg);
 				}else{				
 					error = true;
 					res = new Object();

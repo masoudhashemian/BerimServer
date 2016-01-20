@@ -61,5 +61,41 @@ module.exports ={
 							join.remove(function(err){});												
 							return res.send(200, data.serialize());
 						});
-					}					
+					},
+					getBerim: function(req, res, next){
+						var params = _.pick(req.body, 'placeId');
+						if(params.placeId == null){
+							return next("Place ID must exist!");
+						}
+						req.models.room.find(params, function(err, rooms){
+							if(err){
+								return next("DB internal error!");
+							}							
+							for(var i = 0 ; i < rooms.length ; i++){
+								rooms[i] = rooms[i].serialize();
+							}
+							result = {};
+							result.rooms = rooms;
+							return res.send(200, result);
+						});
+					},
+					getMember: function(req, res, next){
+						var params = _.pick(req.body, 'roomId');
+						if(params.roomId == null){
+							return next("Room ID must exist!");
+						}
+						req.models.join.find(params, function(err, joins){
+							if(err){
+								return next("DB internal error!");
+							}							
+							users = [];
+							for(var i = 0 ; i < joins.length ; i++){
+								join = joins[i].serialize();
+								users.push(join.user);
+							}
+							result = {};
+							result.users = users;
+							return res.send(200, result);
+						});
+					}
 				};
