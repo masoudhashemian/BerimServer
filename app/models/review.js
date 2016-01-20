@@ -75,17 +75,34 @@ module.exports = function (orm, db)
 									avg = sum /(length+1);
 								}							
 								place.rate = avg;
-								if(!update){
+								/*if(!update){
 									reviews.push(obj);
 								}
 								temp = {};
 								temp.reviews = reviews;
-								place.reviews = temp;
+								place.reviews = temp;*/
 								place.save();
 								//obj.place = place;
 								return next();
 							});
 						});
+					},
+					afterSave: function(param){
+						obj = this;
+						db.models.place.get(obj.placeId, function(err, place){
+							db.models.review.find({placeId: obj.placeId}, function(err, reviews){
+								if(err){
+									console.log("DB internal error!");
+								}
+								for(var i = 0 ; i < reviews.length ; i++){
+									reviews[i] = reviews[i].serialize();
+								}
+								temp = {};
+								temp.reviews = reviews;
+								place.reviews = temp;
+								place.save();
+							});							
+						});												
 					}
 		}  ,		
 		
