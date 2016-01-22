@@ -19,7 +19,7 @@ module.exports ={
 						});
 					},
 					getList: function(req, res, next){
-						req.models.place.find({}, function(err, places){
+						req.models.place.find({}, ['lastUpdate', 'Z'],function(err, places){
 							if(err){
 								return next('DB internal error!');
 							}								

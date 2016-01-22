@@ -13,7 +13,7 @@ module.exports = {
 	res.sendfile(settings.path + '/uploads/avatars/'+fileName);  
   },
   saveFile: function(req, res, next){	
-	var params = _.pick(req.body, 'userId');
+	//var params = _.pick(req.body, 'userId');
 	fs.readFile(req.files.file.path, function (err, data) {  				
 		/*if(!helpers.hasValidExtention(req.files.file.type)){
 			error = true;
@@ -23,32 +23,32 @@ module.exports = {
 			console.log(result);			
 			res.json(result);				
 		}*/
-		req.models.user.get(params.userId, function(err, user){
-			var error = false;
-			var errorMessage = "";
-			if(err){
+		//req.models.user.get(params.userId, function(err, user){
+			//var error = false;
+			//var errorMessage = "";
+			//if(err){
 				//return next("DB internal error!");
-				error = true;
-				errorMessage = "DB internal error!";
-			}
-			if(user == null){
+				//error = true;
+				//errorMessage = "DB internal error!";
+			//}
+			//if(user == null){
 				//return next('User not found!');
-				error = true;
-				errorMessage = "User not found!";
-			}
-			else if(!user.vip && req.files.file.size > 2000){
+				//error = true;
+				//errorMessage = "User not found!";
+			//}
+			//else if(!user.vip && req.files.file.size > 2000){
 				//return next('non-VIP user uploading large file!');
-				error = true;
-				errorMessage = "non-VIP user uploading large file!";
-			}
-			if(error){			
-				result = new Object();
-				result.error = error;
-				result.errorMessage = errorMessage;
-				console.log(result);			
-				res.json(result);	
-				return;
-			}
+				//error = true;
+				//errorMessage = "non-VIP user uploading large file!";
+			//}
+			//if(error){			
+				//result = new Object();
+				//result.error = error;
+				//result.errorMessage = errorMessage;
+				//console.log(result);			
+				//res.json(result);	
+				//return;
+			//}
 			console.log(req.files.file);
 			fileName = new Date().getTime() + req.files.file.name;
 			newPath = settings.path + '/uploads/fileSharing/'+fileName;
@@ -70,7 +70,7 @@ module.exports = {
 					res.json(result);
 				}
 			});
-		});		
+		//});		
 	});
   }
 };

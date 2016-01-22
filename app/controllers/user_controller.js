@@ -218,7 +218,7 @@ module.exports ={
 						});						
 					},
 					editProfile: function(req, res, next){
-						var params = _.pick(req.body, 'userId', 'avatar', 'nickName');
+						var params = _.pick(req.body, 'userId', 'avatar', 'nickName', 'vip');
 						req.models.user.get(params.userId, function(err, user){		
 							if(user == null)			
 							{								
@@ -229,6 +229,9 @@ module.exports ={
 								}
 								if(params.nickName != null){
 									user.nickName = params.nickName;	
+								}
+								if(params.vip != null){
+									user.vip = params.vip;
 								}
 								user.save(function(err){});
 								return res.send(200, user.serialize());

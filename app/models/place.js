@@ -12,7 +12,8 @@ module.exports = function (orm, db)
 		category   : { type: 'text'},
 		description : { type : 'text'},
 		reviews    : { type: 'object'},
-		rate       : { type: 'number'}
+		rate       : { type: 'number'},
+		lastUpdate : { type: 'date', time : true}
 	},
 		
 	{   		
@@ -41,6 +42,10 @@ module.exports = function (orm, db)
 						if(obj.name == null){
 							obj.name = "unknown";
 						}*/
+						return next();
+					},
+					beforeSave: function(next){
+						this.lastUpdate = Date.now();
 						return next();
 					}
 		}  ,

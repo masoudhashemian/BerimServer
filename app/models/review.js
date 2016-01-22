@@ -81,7 +81,7 @@ module.exports = function (orm, db)
 								temp = {};
 								temp.reviews = reviews;
 								place.reviews = temp;*/
-								place.save();
+								place.save();								
 								//obj.place = place;
 								return next();
 							});
@@ -100,6 +100,7 @@ module.exports = function (orm, db)
 								temp = {};
 								temp.reviews = reviews;
 								place.reviews = temp;
+								console.log(place.serialize);
 								place.save();
 							});							
 						});												
