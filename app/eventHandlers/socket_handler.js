@@ -208,11 +208,12 @@ module.exports = function(io ,socket, clients, numOfConnection){
 			{form : data},
 			function (error, response, body) {
 				if (!error && response.statusCode == 200) {
-					body = JSON.parse(body);
+					room = JSON.parse(body);
+					socket.join(room.id);
 					error = false;
 					res = new Object();
 					res.error = error;
-					res.data = body;		
+					res.data = room;		
 					//res.data = md5(res.data);
 					socket.emit('addRoomResponse', res);
 				}else{				
@@ -356,6 +357,8 @@ module.exports = function(io ,socket, clients, numOfConnection){
 		if(!helpers.checkLogin(socket, responseEvent)){
 			return;
 		}		
+		data.userId = socket.userId;
+		console.log(data);
 		request.post(
 			settings.serverAddress+'/user/search_user',
 			{ form: data},

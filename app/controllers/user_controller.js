@@ -139,18 +139,24 @@ module.exports ={
 						}
 					},
 					searchUser: function(req, res, next){
-						var params = _.pick(req.body, 'query');
-						req.models.user.find({$or:[{phoneNumber:{$regex: params.query}},{nickName:{$regex: params.query}}]}, function(err, users){		
+						var params = _.pick(req.body, 'query', 'userId');
+						req.models.user.find({$or:[{phoneNumber:{$regex: params.query, $options: 'i'}},{nickName:{$regex: params.query,  $options: 'i'}}]}, function(err, users){		
 							if(users == null)			
 							{								
 								return res.send(600, 'Error in DB!');					
 							}else{
+								result = [];
 								for(var i = 0 ; i < users.length ; i++){
-									users[i] = users[i].serialize();
+									user = users[i];
+									if(user._id != params.userId){
+										console.log(user._id);
+										console.log(params.userId);
+										result.push(user.serialize());
+									}									
 								}
-								console.log(users.length + ' users found!');								
+								console.log(result.length + ' users found!');								
 								data = {};
-								data.users = users;
+								data.users = result;
 								return res.send(200, data);
 							}
 						});						

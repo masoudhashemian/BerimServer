@@ -3,6 +3,7 @@ var controllers = require('../app/controllers')
 
 module.exports = function (app) {
   app.get( '/'                           , controllers.home.home);
+  app.get( '/my-upload'                  , controllers.home.myUpload);
   app.post( '/user/sign_up'                   , controllers.user.register);
   app.post( '/user/sign_in'                       ,controllers.user.signIn);  
   app.post('/room/add_room'                 ,controllers.room.register);

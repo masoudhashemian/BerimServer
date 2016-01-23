@@ -48,6 +48,7 @@ module.exports = function (orm, db)
 		{
 			serialize: function () 
 			{
+				console.log(this.phoneNumber+' , '+this.nickName+' , '+this.room);
 				return {
 					id           : this._id,					
 					phoneNumber  : this.phoneNumber,
